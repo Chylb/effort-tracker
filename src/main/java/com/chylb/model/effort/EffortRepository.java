@@ -1,0 +1,30 @@
+package com.chylb.model.effort;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
+
+import java.util.List;
+
+public interface EffortRepository extends PagingAndSortingRepository<Effort, Long> {
+    List<Effort> getEffortsByActivityId(long id);
+
+    List<Effort> getEffortsByDistanceId(long id);
+
+    @Query(value = "SELECT * FROM effort e JOIN distance d ON e.distance_id = d.id JOIN athlete a ON d.athlete_id = a.id WHERE a.id = :id "
+            , nativeQuery = true)
+    List<Effort> getEffortsByAthleteId(long id);
+
+    @Query(value = "SELECT * FROM effort e JOIN activity a ON e.activity_id = a.id AND year(a.date) = :year JOIN " +
+            "(SELECT min(time) as min_time, MONTH(a.date) AS month FROM effort e INNER JOIN activity a ON e.activity_id = a.id  WHERE e.distance_id = :id AND YEAR(a.date) = :year group by month) " +
+            "AS k ON MONTH(a.date) = k.month AND e.time = k.min_time AND e.distance_id = :id ORDER BY k.month ASC "
+            , nativeQuery = true)
+    List<Effort> getSeasonBest(Long id, int year);
+
+    @Query(value = "SELECT * FROM effort e JOIN activity a ON e.activity_id = a.id JOIN " +
+            "(SELECT min(time) as min_time, YEAR(a.date) AS year FROM effort e INNER JOIN activity a ON e.activity_id = a.id  WHERE e.distance_id = :id group by year ) " +
+            "AS k ON year(a.date) = k.year AND e.time = k.min_time WHERE e.distance_id = :id ORDER BY k.year ASC "
+            , nativeQuery = true)
+    List<Effort> getAllTimeBest(Long id);
+}
+

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <div th:replace="fragments/head ::head"></div>
+    <title>Distances</title>
+
+    <style>
+        .container {
+            padding-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="fragments/navbar ::navbar"></div>
+
+<div class="container">
+    <h1 class="float-left" id="distance">My distances</h1>
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-secondary float-right" data-toggle="modal" data-target="#exampleModal">
+        Add
+    </button>
+</div>
+</br>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="javascript:addDistance();">
+                <div class="modal-body">
+                    <h2>Add a new distance</h2>
+
+                    <div class="form-group">
+                        <input id="name" type="text" class="form-control" placeholder="Name" required="required">
+                    </div>
+                    <div class="form-group">
+                        <input id="length" type="number" class="form-control" placeholder="Length" required="required">
+                    </div>
+
+                </div>
+
+                <div id="alert" class="alert text-center" role="alert" style="display: none"></div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal"
+                            onclick="closeAddDistanceDialog()">Close
+                    </button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <table class="table table-striped" id="distanceTable">
+        <thead>
+        <tr>
+            <th scope="col">Distance</th>
+            <th scope="col">Number of efforts</th>
+            <th scope="col">Best time</th>
+            <th scope="col">Best pace</th>
+        </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $("#navDistances").addClass("active");
+
+    $.getJSON("/api/distances", function (data) {
+        populateTable(data);
+    })
+
+    function populateTable(data) {
+        const table = $('#distanceTable');
+        console.log(data);
+
+        for (const d of data) {
+            const row = `<tr>
+                  <td><a href="/distance/${d.id}">${d.name}</a></td>
+                  <td>${d.effortCount}</td>
+                  <td>${secondsToString(d.bestTime)}</td>
+                  <td>${secondsToString(d.bestTime / d.length * 1000)}</td>
+                  `
+            table.append(row)
+        }
+    }
+
+    function closeAddDistanceDialog() {
+        $("#alert").removeClass("alert-success").removeClass("alert-danger").hide();
+    }
+
+    function addDistance() {
+        const distance = {
+            name: $("#name").val(),
+            length: $("#length").val()
+        };
+
+        $("#alert").removeClass("alert-success").removeClass("alert-danger").show();
+
+        $.ajax({
+            type: "POST",
+            url: "/api/distances",
+            data: JSON.stringify(distance),
+            success: function (x) {
+                $("#alert").addClass("alert-success").text("Successfully added");
+            },
+            error: function (xhr, status, error) {
+                $("#alert").addClass("alert-danger").text("Invalid distance");
+            },
+            dataType: "json",
+            contentType: "application/json"
+        });
+    }
+</script>
+
+<div th:replace="fragments/footer ::footer"></div>
+
+</body>
+</html>
