@@ -1,0 +1,48 @@
+server:
+  port: ${PORT}
+
+spring:
+  application:
+    name: effort-tracker
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+
+    url: jdbc:postgresql://localhost:5432/comchylb?useSSL=true
+    username: postgres
+    password: admin
+
+    hikari:
+      auto-commit: false
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+  security:
+    oauth2:
+      client:
+        registration:
+          strava:
+            provider: strava-provider
+            client-id: ${CLIENT-ID}
+            client-secret: ${CLIENT-SECRET}
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+            redirect-uri: http://localhost:8080/login/oauth2/code/strava
+            scope: activity:read_all
+        provider:
+          strava-provider:
+            tokenUri: https://www.strava.com/oauth/token
+            user-info-uri: https://www.strava.com/api/v3/athlete
+            user-name-attribute: id
+            authorization-uri: https://www.strava.com/oauth/authorize
+            token-uri: https://www.strava.com/oauth/token
+
+#logging:
+#  level:
+#    org.springframework.security: DEBUG
+#    org.hibernate.SQL: DEBUG
+#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
