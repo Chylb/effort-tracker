@@ -36,7 +36,7 @@ class Distances extends Component {
 
 		const distance = {
 			name: event.target.name.value,
-			length: event.target.length.value
+			length: event.target.length.children[1].value
 		};
 
 		try {
