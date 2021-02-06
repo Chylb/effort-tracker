@@ -175,6 +175,49 @@ public class AppService {
         }).start();
     }
 
+    @Transactional
+    public void flagActivity(Activity activity) {
+        if (activity.isFlagged())
+            return;
+
+        activity.setFlagged(true);
+
+        for (Distance distance : distanceRepository.getDistancesByAthleteId(activity.getAthlete().getId())) {
+            recalculateDistanceStatistics(distance);
+        }
+    }
+
+    @Transactional
+    public void unflagActivity(Activity activity) {
+        if (!activity.isFlagged())
+            return;
+
+        activity.setFlagged(false);
+
+        for (Distance distance : distanceRepository.getDistancesByAthleteId(activity.getAthlete().getId())) {
+            recalculateDistanceStatistics(distance);
+        }
+    }
+
+    @Transactional
+    void recalculateDistanceStatistics(Distance distance) {
+        int effortCount = 0;
+        int bestTime = Integer.MAX_VALUE;
+
+        for (Effort effort : effortRepository.getEffortsByDistanceId(distance.getId())) {
+            if(!effort.getActivity().isFlagged()) {
+                effortCount++;
+                if(effort.getTime() < bestTime)
+                    bestTime = effort.getTime();
+            }
+        }
+
+        distance.setEffortCount(effortCount);
+        distance.setBestTime(bestTime);
+
+        distanceRepository.save(distance);
+    }
+
     @Setter //@formatter:off
     private static class ActivityStreamData{
         @Setter static class Time{ List<Integer> data;}

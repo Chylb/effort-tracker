@@ -10,16 +10,16 @@ class Activities extends Component {
 	};
 
 	async componentDidMount() {
-		const activities = await fetchApi('http://localhost:8080/api/activities')
+		const activities = await fetchApi('http://localhost:8080/api/activities');
 
 		this.setState({ activities: activities });
 	}
 
 	renderTableData() {
 		return this.state.activities.map((activity) => {
-			const { id, name, distance, date } = activity
+			const { id, name, distance, date, flagged } = activity;
 			return (
-				<tr key={id}>
+				<tr key={id} className={flagged ? "table-danger" : ""}>
 					<td><Link to={"/activities/" + id}>{name}</Link></td>
 					<td>{distance}</td>
 					<td>{new Date(date).toLocaleString('en-GB')}</td>

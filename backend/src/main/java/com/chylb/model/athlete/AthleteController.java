@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class AthleteController {
@@ -50,6 +51,7 @@ public class AthleteController {
         List<Distance> distances = distanceRepository.getDistancesByAthleteId(id);
         List<Activity> activities = activityRepository.getActivitiesByAthleteId(id);
         List<Effort> efforts = effortRepository.getEffortsByAthleteId(id);
+        efforts = efforts.stream().filter( e -> !e.getActivity().isFlagged()).collect(Collectors.toList());
 
         int bestPace = 0;
         if (distances.size() > 0)

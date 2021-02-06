@@ -41,6 +41,8 @@ public class Activity {
     @ManyToOne
     private Athlete athlete;
 
+    private boolean flagged;
+
     @Transient
     private List<Integer> streamTime;
     @Transient
@@ -56,6 +58,7 @@ public class Activity {
         a.setDistance((float) node.get("distance").asDouble());
         a.setType(node.get("type").asText());
         a.setManual(node.get("manual").asBoolean());
+        a.setFlagged(false);
 
         TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(node.get("start_date_local").asText());
         Instant i = Instant.from(ta);
