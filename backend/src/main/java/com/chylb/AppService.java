@@ -37,9 +37,6 @@ public class AppService {
     ActivityRepository activityRepository;
 
     @Autowired
-    ActivityStreamRepository activityStreamRepository;
-
-    @Autowired
     EffortRepository effortRepository;
 
     @Autowired
@@ -48,33 +45,14 @@ public class AppService {
     @Autowired
     ObjectMapper objectMapper;
 
-    public void loadActivityStream(Activity activity) {
-        ActivityStream activityStream = activityStreamRepository.getActivityStreamById(activity.getId()).get();
-        byte[] compressed = activityStream.getCompressedActivityStream();
-
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            InflaterOutputStream infl = new InflaterOutputStream(out);
-            infl.write(compressed);
-            infl.flush();
-            infl.close();
-
-            byte[] uncompressed = out.toByteArray();
-
-            ActivityStreamData data = objectMapper.readValue(uncompressed, ActivityStreamData.class);
-            activity.setStreamTime(data.time.data);
-            activity.setStreamDistance(data.distance.data);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
+    @Transactional
     public Distance addDistance(Distance distance) {
         Distance savedDistance = distanceRepository.save(distance);
         addEfforts(distance.getAthlete(), savedDistance);
         return savedDistance;
     }
 
+    @Transactional
     public void deleteDistance(Distance distance) {
         List<Effort> efforts = effortRepository.getEffortsByDistanceId(distance.getId());
         for (Effort e : efforts)
@@ -86,7 +64,7 @@ public class AppService {
         List<Activity> activities = activityRepository.getActivitiesByAthleteId(athlete.getId());
 
         for (Activity activity : activities) {
-            loadActivityStream(activity);
+            activity.loadActivityStream();
             Effort effort = activity.calculateEffort(distance);
             if (effort == null)
                 continue;
@@ -149,14 +127,11 @@ public class AppService {
                             .toUriString();
 
                     ResponseEntity<String> response = apiRequester.sendGetRequest(client, uri);
-                    String body = response.getBody();
-                    ActivityStream stream = ActivityStream.fromJson(body);
-                    stream.setId(activity.getId());
+                    activity.setActivityStreamJson(response.getBody().getBytes());
 
                     activityRepository.save(activity);
-                    activityStreamRepository.save(stream);
 
-                    loadActivityStream(activity);
+                    activity.loadActivityStream();
                     for (Distance distance : distances) {
                         Effort effort = activity.calculateEffort(distance);
                         effortRepository.save(effort);
@@ -205,9 +180,9 @@ public class AppService {
         int bestTime = Integer.MAX_VALUE;
 
         for (Effort effort : effortRepository.getEffortsByDistanceId(distance.getId())) {
-            if(!effort.getActivity().isFlagged()) {
+            if (!effort.getActivity().isFlagged()) {
                 effortCount++;
-                if(effort.getTime() < bestTime)
+                if (effort.getTime() < bestTime)
                     bestTime = effort.getTime();
             }
         }
@@ -217,12 +192,4 @@ public class AppService {
 
         distanceRepository.save(distance);
     }
-
-    @Setter //@formatter:off
-    private static class ActivityStreamData{
-        @Setter static class Time{ List<Integer> data;}
-        @Setter static class Distance{ List<Float> data;}
-        Time time;
-        Distance distance;
-    } //@formatter:on
 }

@@ -4,7 +4,10 @@ import com.chylb.model.athlete.Athlete;
 import com.chylb.model.distance.Distance;
 import com.chylb.model.effort.Effort;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 
 import javax.persistence.*;
@@ -14,11 +17,9 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterOutputStream;
 
 @Entity
 @Getter
@@ -43,6 +44,8 @@ public class Activity {
 
     private boolean flagged;
 
+    @Lob
+    private byte[] activityStreamJson;
     @Transient
     private List<Integer> streamTime;
     @Transient
@@ -64,6 +67,26 @@ public class Activity {
         Instant i = Instant.from(ta);
         a.setDate(Date.from(i));
         return a;
+    }
+
+    public void loadActivityStream() {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        try {
+            final JsonNode node = objectMapper.readTree(activityStreamJson);
+
+            streamTime = new LinkedList<>();
+            streamDistance = new LinkedList<>();
+
+            for (final JsonNode n : node.get("time").get("data"))
+                streamTime.add(n.asInt());
+
+            for (final JsonNode n : node.get("distance").get("data"))
+                streamDistance.add((float) n.asDouble());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Effort calculateEffort(Distance distance) {

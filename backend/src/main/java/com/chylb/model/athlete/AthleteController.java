@@ -1,9 +1,7 @@
 package com.chylb.model.athlete;
 
 import com.chylb.model.activity.Activity;
-import com.chylb.model.activity.ActivityController;
 import com.chylb.model.activity.ActivityRepository;
-import com.chylb.model.activity.ActivityStreamRepository;
 import com.chylb.model.distance.Distance;
 import com.chylb.model.distance.DistanceRepository;
 import com.chylb.model.effort.Effort;

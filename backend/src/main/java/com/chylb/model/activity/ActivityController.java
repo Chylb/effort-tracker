@@ -33,8 +33,6 @@ public class ActivityController {
     @Autowired
     EffortRepository effortRepository;
     @Autowired
-    ActivityStreamRepository streamRepository;
-    @Autowired
     AppService appService;
     @Autowired
     ObjectMapper objectMapper;
