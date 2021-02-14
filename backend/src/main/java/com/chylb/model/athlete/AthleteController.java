@@ -11,8 +11,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,18 +36,14 @@ public class AthleteController {
     ObjectMapper objectMapper;
 
     @GetMapping("/api/athlete")
-    public ResponseEntity getAthlete(
-            final @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client) throws JsonProcessingException {
-
-        Athlete athlete = athleteRepository.getAthleteById(Long.parseLong(client.getPrincipalName())).get();
+    public ResponseEntity getAthlete() throws JsonProcessingException {
+        Athlete athlete = athleteRepository.getAthleteById(athleteId()).get();
         return ResponseEntity.ok(objectMapper.writeValueAsString(athlete));
     }
 
     @GetMapping("/api/athlete/summary")
-    public ResponseEntity getAthleteSummary(
-            final @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client) throws JsonProcessingException {
-
-        long id = Long.parseLong(client.getPrincipalName());
+    public ResponseEntity getAthleteSummary() throws JsonProcessingException {
+        long id = athleteId();
         List<Distance> distances = distanceRepository.getDistancesByAthleteId(id);
         List<Activity> activities = activityRepository.getActivitiesByAthleteId(id);
         List<Effort> efforts = effortRepository.getEffortsByAthleteId(id);
@@ -62,6 +60,11 @@ public class AthleteController {
         summary.put("bestPace", bestPace);
 
         return ResponseEntity.ok(objectMapper.writeValueAsString(summary));
+    }
+
+    private long athleteId() {
+        DefaultOAuth2User user = (DefaultOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return Long.parseLong(user.getName());
     }
 }
 

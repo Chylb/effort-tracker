@@ -3,6 +3,7 @@ package com.chylb.model.activity;
 import com.chylb.model.athlete.Athlete;
 import com.chylb.model.distance.Distance;
 import com.chylb.model.effort.Effort;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -44,6 +45,7 @@ public class Activity {
 
     private boolean flagged;
 
+    @JsonIgnore
     @Lob
     private byte[] activityStreamJson;
     @Transient

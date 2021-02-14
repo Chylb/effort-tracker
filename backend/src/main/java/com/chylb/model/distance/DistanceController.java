@@ -12,8 +12,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,27 +40,24 @@ public class DistanceController {
     ObjectMapper objectMapper;
 
     @GetMapping("/api/distances")
-    public ResponseEntity distances(
-            final @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client) throws JsonProcessingException {
-        List<Distance> distances = distanceRepository.getDistancesByAthleteId(Long.parseLong(client.getPrincipalName()));
+    public ResponseEntity distances() throws JsonProcessingException {
+        List<Distance> distances = distanceRepository.getDistancesByAthleteId(athleteId());
         return ResponseEntity.ok(objectMapper.writeValueAsString(distances));
     }
 
     @GetMapping("/api/distances/{id}")
-    public ResponseEntity<String> getDistance(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client,
-                                              @PathVariable(value = "id") Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getDistance(@PathVariable(value = "id") Long id) throws JsonProcessingException {
         Optional<Distance> distance = distanceRepository.getDistanceById(id);
-        ResponseEntity r = validateGetRequest(client, distance);
+        ResponseEntity r = validateGetRequest(athleteId(), distance);
         if (r != null) return r;
 
         return ResponseEntity.ok(objectMapper.writeValueAsString(distance.get()));
     }
 
     @GetMapping("/api/distances/{id}/efforts")
-    public ResponseEntity<String> getDistanceEfforts(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client,
-                                                     @PathVariable(value = "id") Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getDistanceEfforts(@PathVariable(value = "id") Long id) throws JsonProcessingException {
         Optional<Distance> distance = distanceRepository.getDistanceById(id);
-        ResponseEntity r = validateGetRequest(client, distance);
+        ResponseEntity r = validateGetRequest(athleteId(), distance);
         if (r != null) return r;
 
         List<Effort> efforts = effortRepository.getEffortsByDistanceId(id);
@@ -66,11 +65,10 @@ public class DistanceController {
     }
 
     @GetMapping("/api/distances/{id}/seasonBest")
-    public ResponseEntity<String> getSeasonBest(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client,
-                                                @PathVariable(value = "id") Long id,
+    public ResponseEntity<String> getSeasonBest(@PathVariable(value = "id") Long id,
                                                 @RequestParam("year") int year) throws JsonProcessingException {
         Optional<Distance> distance = distanceRepository.getDistanceById(id);
-        ResponseEntity r = validateGetRequest(client, distance);
+        ResponseEntity r = validateGetRequest(athleteId(), distance);
         if (r != null) return r;
 
         List<Effort> efforts = effortRepository.getSeasonBest(id, year);
@@ -78,10 +76,9 @@ public class DistanceController {
     }
 
     @GetMapping("/api/distances/{id}/allTimeBest")
-    public ResponseEntity<String> getAllTimeBest(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client,
-                                                 @PathVariable(value = "id") Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getAllTimeBest(@PathVariable(value = "id") Long id) throws JsonProcessingException {
         Optional<Distance> distance = distanceRepository.getDistanceById(id);
-        ResponseEntity r = validateGetRequest(client, distance);
+        ResponseEntity r = validateGetRequest(athleteId(), distance);
         if (r != null) return r;
 
         List<Effort> efforts = effortRepository.getAllTimeBest(id);
@@ -89,17 +86,15 @@ public class DistanceController {
     }
 
     @PostMapping("/api/distances")
-    public ResponseEntity addDistance(
-            @RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client,
-            @RequestBody Distance newDistance)
+    public ResponseEntity addDistance(@RequestBody Distance newDistance)
             throws JsonProcessingException {
 
         if (newDistance.getLength() <= 0 || newDistance.getName().length() == 0)
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
 
-        Athlete athlete = athleteRepository.getAthleteById(Long.parseLong(client.getPrincipalName())).get();
+        Athlete athlete = athleteRepository.getAthleteById(athleteId()).get();
         String name = newDistance.getName();
-        List<Distance> distances = distanceRepository.getDistancesByAthleteId(Long.parseLong(client.getPrincipalName()));
+        List<Distance> distances = distanceRepository.getDistancesByAthleteId(athleteId());
         if (distances.stream().map(Distance::getName).collect(Collectors.toList()).contains(name)) //no 2 distances with the same name
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
 
@@ -111,10 +106,10 @@ public class DistanceController {
     }
 
     @DeleteMapping(value = "/api/distances/{id}")
-    public ResponseEntity<Long> deleteDistance(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client, @PathVariable Long id) {
+    public ResponseEntity<Long> deleteDistance(@PathVariable Long id) {
         Optional<Distance> distance = distanceRepository.getDistanceById(id);
         if (distance.isPresent()) {
-            if (distance.get().getAthlete().getId() == Long.parseLong(client.getPrincipalName())) {
+            if (distance.get().getAthlete().getId() == athleteId()) {
                 appService.deleteDistance(distance.get());
                 return ResponseEntity.ok(id);
             } else
@@ -124,11 +119,16 @@ public class DistanceController {
         }
     }
 
-    private ResponseEntity<HttpStatus> validateGetRequest(OAuth2AuthorizedClient client, Optional<Distance> distance) {
+    private ResponseEntity<HttpStatus> validateGetRequest(long athleteId, Optional<Distance> distance) {
         if (!distance.isPresent())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        if (distance.get().getAthlete().getId() != Long.parseLong(client.getPrincipalName()))
+        if (distance.get().getAthlete().getId() != athleteId)
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         return null;
+    }
+
+    private long athleteId() {
+        DefaultOAuth2User user = (DefaultOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return Long.parseLong(user.getName());
     }
 }

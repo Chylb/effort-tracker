@@ -21,10 +21,11 @@ public class WebSecurityConfig {
             http
                     .authorizeRequests(a -> a
                             .antMatchers(HttpMethod.OPTIONS,"**").permitAll()
+                            .antMatchers("/v3/**", "/swagger-ui.html", "/swagger-ui/**", "/login/**").permitAll()
                             .anyRequest().authenticated()
                     )
                     .exceptionHandling(e -> e
-                            .defaultAuthenticationEntryPointFor(getRestAuthenticationEntryPoint(), new AntPathRequestMatcher("/api/**"))
+                            .defaultAuthenticationEntryPointFor(getRestAuthenticationEntryPoint(), new AntPathRequestMatcher("**"))
                     )
                     .csrf().disable()
                     .oauth2Login()

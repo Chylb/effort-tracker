@@ -12,8 +12,11 @@ import org.apache.catalina.Manager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
@@ -38,28 +41,25 @@ public class ActivityController {
     ObjectMapper objectMapper;
 
     @GetMapping("/api/activities")
-    public ResponseEntity<String> getActivities(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client) throws JsonProcessingException {
-        List<Activity> activities = activityRepository.getActivitiesByAthleteId(Long.parseLong(client.getPrincipalName()));
+    public ResponseEntity<String> getActivities() throws JsonProcessingException {
+        List<Activity> activities = activityRepository.getActivitiesByAthleteId(athleteId());
         return ResponseEntity.ok(objectMapper.writeValueAsString(activities));
     }
 
     @GetMapping("/api/activities/{id}")
-    public ResponseEntity<String> getActivity(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client,
-                                              @PathVariable(value = "id") Long id) throws JsonProcessingException {
-
+    public ResponseEntity<String> getActivity(@PathVariable(value = "id") Long id) throws JsonProcessingException {
         Optional<Activity> activity = activityRepository.getActivityById(id);
-        ResponseEntity r = validateGetRequest(client, activity);
+        ResponseEntity r = validateGetRequest(athleteId(), activity);
         if (r != null) return r;
 
         return ResponseEntity.ok(objectMapper.writeValueAsString(activity.get()));
     }
 
     @GetMapping("/api/activities/{id}/efforts")
-    public ResponseEntity<String> getActivityEfforts(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client,
-                                                     @PathVariable(value = "id") Long id) throws JsonProcessingException {
+    public ResponseEntity<String> getActivityEfforts(@PathVariable(value = "id") Long id) throws JsonProcessingException {
 
         Optional<Activity> activity = activityRepository.getActivityById(id);
-        ResponseEntity r = validateGetRequest(client, activity);
+        ResponseEntity r = validateGetRequest(athleteId(), activity);
         if (r != null) return r;
 
         List<Effort> efforts = effortRepository.getEffortsByActivityId(id);
@@ -67,10 +67,9 @@ public class ActivityController {
     }
 
     @PatchMapping(path = "/api/activities/{id}")
-    public ResponseEntity<Activity> updateActivity(@RegisteredOAuth2AuthorizedClient OAuth2AuthorizedClient client,
-                                                   @PathVariable(value = "id") Long id, @RequestBody Map<String, Object> fields) throws JsonProcessingException {
+    public ResponseEntity<Activity> updateActivity(@PathVariable(value = "id") Long id, @RequestBody Map<String, Object> fields) throws JsonProcessingException {
         Optional<Activity> activity = activityRepository.getActivityById(id);
-        ResponseEntity r = validateGetRequest(client, activity);
+        ResponseEntity r = validateGetRequest(athleteId(), activity);
         if (r != null) return r;
 
         fields.forEach((k, v) -> {
@@ -85,11 +84,16 @@ public class ActivityController {
         return ResponseEntity.ok(activityRepository.save(activity.get()));
     }
 
-    private ResponseEntity<HttpStatus> validateGetRequest(OAuth2AuthorizedClient client, Optional<Activity> activity) {
+    private ResponseEntity<HttpStatus> validateGetRequest(long athleteId, Optional<Activity> activity) {
         if (!activity.isPresent())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        if (activity.get().getAthlete().getId() != Long.parseLong(client.getPrincipalName()))
+        if (activity.get().getAthlete().getId() != athleteId)
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         return null;
+    }
+
+    private long athleteId() {
+        DefaultOAuth2User user = (DefaultOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return Long.parseLong(user.getName());
     }
 }
