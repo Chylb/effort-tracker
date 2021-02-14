@@ -20,45 +20,45 @@ public class ApiRequester {
             final OAuth2AuthorizedClient client,
             final String url) {
 
-        final RestTemplate restTemplate = new RestTemplate();
+//        final RestTemplate restTemplate = new RestTemplate();
+//
+//        final HttpHeaders headers = new HttpHeaders();
+//        headers.setBearerAuth(client.getAccessToken().getTokenValue());
+//        final HttpEntity<String> entity =
+//                new HttpEntity<String>("parameters", headers);
+//
+//        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+//
+//        return response;
 
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(client.getAccessToken().getTokenValue());
-        final HttpEntity<String> entity =
-                new HttpEntity<String>("parameters", headers);
+        try {
+            String fileName = "./savedRequests/" + url.replaceAll("[\\\\/:*?\"<>|]", "");
+            File file = new File(fileName);
 
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            if (file.exists()) {
+                String content = Files.readString(Path.of(file.getPath()), StandardCharsets.UTF_8);
+                return ResponseEntity.ok().body(content);
+            } else {
+                System.out.println(url);
+                final RestTemplate restTemplate = new RestTemplate();
 
-        return response;
+                final HttpHeaders headers = new HttpHeaders();
+                headers.setBearerAuth(client.getAccessToken().getTokenValue());
+                final HttpEntity<String> entity =
+                        new HttpEntity<String>("parameters", headers);
 
-//        try {
-//            String fileName = "./savedRequests/" + url.replaceAll("[\\\\/:*?\"<>|]", "");
-//            File file = new File(fileName);
-//
-//            if (file.exists()) {
-//                String content = Files.readString(Path.of(file.getPath()), StandardCharsets.UTF_8);
-//                return ResponseEntity.ok().body(content);
-//            } else {
-//                System.out.println(url);
-//                final RestTemplate restTemplate = new RestTemplate();
-//
-//                final HttpHeaders headers = new HttpHeaders();
-//                headers.setBearerAuth(client.getAccessToken().getTokenValue());
-//                final HttpEntity<String> entity =
-//                        new HttpEntity<String>("parameters", headers);
-//
-//                ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-//
-//                PrintWriter writer = new PrintWriter(file);
-//                writer.print(response.getBody());
-//                writer.close();
-//
-//                return response;
-//            }
-//        } catch (Exception e) {
-//            System.out.println(e.getMessage());
-//            return null;
-//        }
+                ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+
+                PrintWriter writer = new PrintWriter(file);
+                writer.print(response.getBody());
+                writer.close();
+
+                return response;
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 }
 

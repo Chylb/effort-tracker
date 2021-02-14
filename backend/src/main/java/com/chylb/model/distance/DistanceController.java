@@ -1,6 +1,9 @@
 package com.chylb.model.distance;
 
 import com.chylb.AppService;
+import com.chylb.exceptions.ForbiddenException;
+import com.chylb.exceptions.NotFoundException;
+import com.chylb.exceptions.UnprocessableEntityException;
 import com.chylb.model.activity.ActivityRepository;
 import com.chylb.model.activity.ActivityController;
 import com.chylb.model.athlete.Athlete;
@@ -48,8 +51,7 @@ public class DistanceController {
     @GetMapping("/api/distances/{id}")
     public ResponseEntity<String> getDistance(@PathVariable(value = "id") Long id) throws JsonProcessingException {
         Optional<Distance> distance = distanceRepository.getDistanceById(id);
-        ResponseEntity r = validateGetRequest(athleteId(), distance);
-        if (r != null) return r;
+        validateGetRequest(athleteId(), distance);
 
         return ResponseEntity.ok(objectMapper.writeValueAsString(distance.get()));
     }
@@ -57,8 +59,7 @@ public class DistanceController {
     @GetMapping("/api/distances/{id}/efforts")
     public ResponseEntity<String> getDistanceEfforts(@PathVariable(value = "id") Long id) throws JsonProcessingException {
         Optional<Distance> distance = distanceRepository.getDistanceById(id);
-        ResponseEntity r = validateGetRequest(athleteId(), distance);
-        if (r != null) return r;
+        validateGetRequest(athleteId(), distance);
 
         List<Effort> efforts = effortRepository.getEffortsByDistanceId(id);
         return ResponseEntity.ok(objectMapper.writeValueAsString(efforts));
@@ -68,8 +69,7 @@ public class DistanceController {
     public ResponseEntity<String> getSeasonBest(@PathVariable(value = "id") Long id,
                                                 @RequestParam("year") int year) throws JsonProcessingException {
         Optional<Distance> distance = distanceRepository.getDistanceById(id);
-        ResponseEntity r = validateGetRequest(athleteId(), distance);
-        if (r != null) return r;
+        validateGetRequest(athleteId(), distance);
 
         List<Effort> efforts = effortRepository.getSeasonBest(id, year);
         return ResponseEntity.ok(objectMapper.writeValueAsString(efforts));
@@ -78,8 +78,7 @@ public class DistanceController {
     @GetMapping("/api/distances/{id}/allTimeBest")
     public ResponseEntity<String> getAllTimeBest(@PathVariable(value = "id") Long id) throws JsonProcessingException {
         Optional<Distance> distance = distanceRepository.getDistanceById(id);
-        ResponseEntity r = validateGetRequest(athleteId(), distance);
-        if (r != null) return r;
+        validateGetRequest(athleteId(), distance);
 
         List<Effort> efforts = effortRepository.getAllTimeBest(id);
         return ResponseEntity.ok(objectMapper.writeValueAsString(efforts));
@@ -90,13 +89,13 @@ public class DistanceController {
             throws JsonProcessingException {
 
         if (newDistance.getLength() <= 0 || newDistance.getName().length() == 0)
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+            throw new UnprocessableEntityException("Bad distance");
 
         Athlete athlete = athleteRepository.getAthleteById(athleteId()).get();
         String name = newDistance.getName();
         List<Distance> distances = distanceRepository.getDistancesByAthleteId(athleteId());
         if (distances.stream().map(Distance::getName).collect(Collectors.toList()).contains(name)) //no 2 distances with the same name
-            return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).build();
+            throw new UnprocessableEntityException("Name already occupied");
 
         newDistance.setAthlete(athlete);
 
@@ -113,18 +112,17 @@ public class DistanceController {
                 appService.deleteDistance(distance.get());
                 return ResponseEntity.ok(id);
             } else
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                throw new ForbiddenException("Access denied");
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            throw new ForbiddenException("Distance not found");
         }
     }
 
-    private ResponseEntity<HttpStatus> validateGetRequest(long athleteId, Optional<Distance> distance) {
+    private void validateGetRequest(long athleteId, Optional<Distance> distance) {
         if (!distance.isPresent())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            throw new NotFoundException("Distance not found");
         if (distance.get().getAthlete().getId() != athleteId)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        return null;
+            throw new ForbiddenException("Access denied");
     }
 
     private long athleteId() {

@@ -1,6 +1,9 @@
 package com.chylb.model.activity;
 
 import com.chylb.AppService;
+import com.chylb.exceptions.ForbiddenException;
+import com.chylb.exceptions.NotFoundException;
+import com.chylb.exceptions.UnprocessableEntityException;
 import com.chylb.model.athlete.Athlete;
 import com.chylb.model.distance.Distance;
 import com.chylb.model.effort.Effort;
@@ -49,8 +52,7 @@ public class ActivityController {
     @GetMapping("/api/activities/{id}")
     public ResponseEntity<String> getActivity(@PathVariable(value = "id") Long id) throws JsonProcessingException {
         Optional<Activity> activity = activityRepository.getActivityById(id);
-        ResponseEntity r = validateGetRequest(athleteId(), activity);
-        if (r != null) return r;
+        validateGetRequest(athleteId(), activity);
 
         return ResponseEntity.ok(objectMapper.writeValueAsString(activity.get()));
     }
@@ -59,8 +61,7 @@ public class ActivityController {
     public ResponseEntity<String> getActivityEfforts(@PathVariable(value = "id") Long id) throws JsonProcessingException {
 
         Optional<Activity> activity = activityRepository.getActivityById(id);
-        ResponseEntity r = validateGetRequest(athleteId(), activity);
-        if (r != null) return r;
+        validateGetRequest(athleteId(), activity);
 
         List<Effort> efforts = effortRepository.getEffortsByActivityId(id);
         return ResponseEntity.ok(objectMapper.writeValueAsString(efforts));
@@ -69,8 +70,7 @@ public class ActivityController {
     @PatchMapping(path = "/api/activities/{id}")
     public ResponseEntity<Activity> updateActivity(@PathVariable(value = "id") Long id, @RequestBody Map<String, Object> fields) throws JsonProcessingException {
         Optional<Activity> activity = activityRepository.getActivityById(id);
-        ResponseEntity r = validateGetRequest(athleteId(), activity);
-        if (r != null) return r;
+        validateGetRequest(athleteId(), activity);
 
         fields.forEach((k, v) -> {
             if (k.equals("flagged")) {
@@ -84,12 +84,11 @@ public class ActivityController {
         return ResponseEntity.ok(activityRepository.save(activity.get()));
     }
 
-    private ResponseEntity<HttpStatus> validateGetRequest(long athleteId, Optional<Activity> activity) {
+    private void validateGetRequest(long athleteId, Optional<Activity> activity) {
         if (!activity.isPresent())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            throw new NotFoundException("Activity not found");
         if (activity.get().getAthlete().getId() != athleteId)
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        return null;
+            throw new ForbiddenException("Access denied");
     }
 
     private long athleteId() {
