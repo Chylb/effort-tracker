@@ -61,7 +61,7 @@ public class DistanceController {
         Optional<Distance> distance = distanceRepository.getDistanceById(id);
         validateGetRequest(athleteId(), distance);
 
-        List<Effort> efforts = effortRepository.getEffortsByDistanceId(id);
+        List<Effort> efforts = effortRepository.getUnflaggedEffortsByDistanceId(id);
         return ResponseEntity.ok(objectMapper.writeValueAsString(efforts));
     }
 
