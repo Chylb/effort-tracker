@@ -9,45 +9,45 @@ import com.chylb.model.effort.EffortRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping(path = "/api/athlete")
 public class AthleteController {
+    private final AthleteRepository athleteRepository;
+    private final ActivityRepository activityRepository;
+    private final DistanceRepository distanceRepository;
+    private final EffortRepository effortRepository;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    AthleteRepository athleteRepository;
-    @Autowired
-    ActivityRepository activityRepository;
-    @Autowired
-    DistanceRepository distanceRepository;
-    @Autowired
-    EffortRepository effortRepository;
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @GetMapping("/api/athlete")
-    public ResponseEntity getAthlete() throws JsonProcessingException {
-        Athlete athlete = athleteRepository.getAthleteById(athleteId()).get();
-        return ResponseEntity.ok(objectMapper.writeValueAsString(athlete));
+    AthleteController(AthleteRepository athleteRepository, ActivityRepository activityRepository, DistanceRepository distanceRepository, EffortRepository effortRepository, ObjectMapper objectMapper) {
+        this.athleteRepository = athleteRepository;
+        this.activityRepository = activityRepository;
+        this.distanceRepository = distanceRepository;
+        this.effortRepository = effortRepository;
+        this.objectMapper = objectMapper;
     }
 
-    @GetMapping("/api/athlete/summary")
+    @GetMapping()
+    public Athlete getAthlete() {
+        return athleteRepository.getAthleteById(athleteId());
+    }
+
+    @GetMapping("/summary")
     public ResponseEntity getAthleteSummary() throws JsonProcessingException {
         long id = athleteId();
         List<Distance> distances = distanceRepository.getDistancesByAthleteId(id);
         List<Activity> activities = activityRepository.getActivitiesByAthleteId(id);
         List<Effort> efforts = effortRepository.getEffortsByAthleteId(id);
-        efforts = efforts.stream().filter( e -> !e.getActivity().isFlagged()).collect(Collectors.toList());
+        efforts = efforts.stream().filter(e -> !e.getActivity().isFlagged()).collect(Collectors.toList());
 
         int bestPace = 0;
         if (distances.size() > 0)

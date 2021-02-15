@@ -8,7 +8,6 @@ import java.util.List;
 
 public interface EffortRepository extends PagingAndSortingRepository<Effort, Long> {
     List<Effort> getEffortsByActivityId(long id);
-
     List<Effort> getEffortsByDistanceId(long id);
 
     @Query(value = "SELECT * FROM effort e JOIN activity a ON e.activity_id = a.id JOIN distance d ON e.distance_id = d.id WHERE d.id = :id AND a.flagged = FALSE "

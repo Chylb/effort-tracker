@@ -1,7 +1,8 @@
 package com.chylb.model.distance;
 
 import com.chylb.model.athlete.Athlete;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +19,6 @@ import javax.persistence.ManyToOne;
 @AllArgsConstructor
 @NoArgsConstructor
 
-@JsonIgnoreProperties(value = { "athlete" })
 public class Distance {
     @Id
     @GeneratedValue
@@ -28,10 +28,13 @@ public class Distance {
 
     private float length;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int bestTime;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private int effortCount = 0;
 
+    @JsonIgnore
     @ManyToOne
     Athlete athlete;
 }

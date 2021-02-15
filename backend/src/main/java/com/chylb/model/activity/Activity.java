@@ -28,8 +28,7 @@ import java.util.zip.InflaterOutputStream;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-
-@JsonIgnoreProperties(value = {"athlete", "streamTime", "streamDistance", "manual"})
+@JsonIgnoreProperties(value = {"athlete", "activityStreamJson", "streamTime", "streamDistance", "manual"})
 public class Activity {
     @Id
     private long id;
@@ -45,11 +44,12 @@ public class Activity {
 
     private boolean flagged;
 
-    @JsonIgnore
     @Lob
     private byte[] activityStreamJson;
+
     @Transient
     private List<Integer> streamTime;
+
     @Transient
     private List<Float> streamDistance;
 

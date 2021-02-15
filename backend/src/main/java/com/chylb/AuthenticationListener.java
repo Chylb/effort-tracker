@@ -1,5 +1,6 @@
 package com.chylb;
 
+import com.chylb.model.activity.ActivityService;
 import com.chylb.model.athlete.Athlete;
 import com.chylb.model.athlete.AthleteRepository;
 import com.chylb.model.athlete.AthleteController;
@@ -23,7 +24,7 @@ public class AuthenticationListener implements ApplicationListener<InteractiveAu
     @Autowired
     AthleteRepository athleteRepository;
     @Autowired
-    AppService appService;
+    ActivityService activityService;
 
     @Override
     public void onApplicationEvent(InteractiveAuthenticationSuccessEvent event) {
@@ -34,8 +35,8 @@ public class AuthenticationListener implements ApplicationListener<InteractiveAu
         Map<String, Object> map = user.getAttributes();
         DefaultOAuth2User defaultUser = (DefaultOAuth2User) event.getAuthentication().getPrincipal();
 
-        Optional<Athlete> athlete = athleteRepository.getAthleteById(Long.parseLong(defaultUser.getName()));
-        if (!athlete.isPresent()) {
+        Athlete athlete = athleteRepository.getAthleteById(Long.parseLong(defaultUser.getName()));
+        if (athlete == null) {
 
             Athlete newAthlete = new Athlete();
             newAthlete.setId(Long.parseLong(defaultUser.getName()));
@@ -43,13 +44,16 @@ public class AuthenticationListener implements ApplicationListener<InteractiveAu
             newAthlete.setProfilePicture(map.get("profile").toString());
             newAthlete.setLastActivitySync(0);
             athleteRepository.save(newAthlete);
-
-//            OAuth2AuthorizedClient client = clientService.loadAuthorizedClient(registrationId, defaultUser.getName());
-//            appService.refreshActivities(client);
         }
 
         OAuth2AuthorizedClient client = clientService.loadAuthorizedClient(registrationId, defaultUser.getName());
-        appService.refreshActivities(client);
+        new Thread(() -> {
+            try {
+                activityService.activitySync(client);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }).start();
     }
 }
 
