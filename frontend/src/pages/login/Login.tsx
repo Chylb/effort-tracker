@@ -1,6 +1,5 @@
-import React, { Component, useEffect } from 'react';
-import { Jumbotron, Container, Table, Carousel } from "react-bootstrap";
-import LoginHeader from '../../components/parts/LoginHeader';
+import React, { useEffect } from 'react';
+import { Container, Carousel } from "react-bootstrap";
 
 export const Login: React.FC = () => {
     useEffect(() => {
@@ -8,13 +7,18 @@ export const Login: React.FC = () => {
         document.body.style.backgroundSize = 'cover';
 
         const footer: HTMLElement = document.getElementById('FOOTER')!;
-        footer.style.filter = "invert(100%)";
+        footer.style.filter = 'invert(100%)';
+
+        return () => {
+            document.body.style.backgroundImage = '';
+
+            const footer: HTMLElement = document.getElementById('FOOTER')!;
+            footer.style.filter = '';
+        }
     });
 
     return (
         <>
-            {!localStorage.getItem("username") && < LoginHeader />}
-
             <Container style={{ width: "1009px" }} className="py-5">
                 <Carousel interval={5000}>
                     <Carousel.Item>

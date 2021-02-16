@@ -1,11 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Nav, Dropdown, NavItem, NavLink } from "react-bootstrap";
-import { logout } from '../../utils/logout';
+import { useAuth } from '../useAuth';
+import { LoginHeader } from './LoginHeader';
 
-function Header() {
+export const Header: React.FC = () => {
+	const { isAuthenticated, isLoading, athlete, logout } = useAuth();
+
 	return (
-		<>
+		<> { isAuthenticated || isLoading ?
 			<Navbar bg="dark" variant="dark" expand="md" className="p-0 mb-3">
 				<Navbar.Brand as={Link} to="/home" className="p-0" > <img src="/logo.png" height="56" alt="logo" /> </Navbar.Brand>
 				<Navbar.Toggle aria-controls="responsive-navbar-nav" />
@@ -16,28 +19,31 @@ function Header() {
 						<Nav.Link as={Link} to="/distances">Distances</Nav.Link>
 					</Nav>
 
-					<Nav className="ml-auto">
-						<Dropdown as={NavItem}>
-							<Dropdown.Toggle as={NavLink}>
-								<img
-									className="px-2"
-									src={localStorage.getItem("avatar")!}
-									alt="user avatar"
-									height="32"
-								/>
-								{localStorage.getItem("username")}
-							</Dropdown.Toggle>
-							<Dropdown.Menu>
-								<Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
-							</Dropdown.Menu>
-						</Dropdown>
+					{isAuthenticated &&
+						<Nav className="ml-auto">
+							<Dropdown as={NavItem}>
+								<Dropdown.Toggle as={NavLink}>
+									<img
+										className="px-2"
+										src={athlete?.profilePicture}
+										alt="user avatar"
+										height="32"
+									/>
+									{athlete?.name}
+								</Dropdown.Toggle>
+								<Dropdown.Menu>
+									<Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
+								</Dropdown.Menu>
+							</Dropdown>
 
-						<a href="https://www.strava.com"><img src="/powered_by_strava.svg" height="56" alt="strava" /></a>
-					</Nav>
+							<a href="https://www.strava.com"><img src="/powered_by_strava.svg" height="56" alt="strava" /></a>
+						</Nav>
+					}
 				</Navbar.Collapse>
 			</Navbar>
+			:
+			<LoginHeader />
+		}
 		</>
-	)
+	);
 }
-
-export default Header;

@@ -1,11 +1,7 @@
-export const logout = (): void => {
-   localStorage.removeItem("username");
-   localStorage.removeItem("avatar");
-
+export const deleteCookies = (): void => {
    document.cookie.split(";").forEach((c) => {
       document.cookie = c
          .replace(/^ +/, "")
          .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
    });
-   window.location.href = "/login";
 };

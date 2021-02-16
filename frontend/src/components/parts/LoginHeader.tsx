@@ -1,8 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Navbar, Nav, Dropdown, NavItem, NavLink } from "react-bootstrap";
+import { Navbar, Nav } from "react-bootstrap";
 
-function LoginHeader() {
+export const LoginHeader: React.FC = () => {
 	return (
 		<>
 			<Navbar variant="dark" expand="md" className="p-0" style={headerStyle}>
@@ -20,5 +19,3 @@ function LoginHeader() {
 const headerStyle = {
 	background: '#49505755',
 }
-
-export default LoginHeader;

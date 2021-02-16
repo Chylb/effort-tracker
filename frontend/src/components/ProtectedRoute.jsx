@@ -1,16 +1,18 @@
-import React from "react";
 import { Route, Redirect } from "react-router-dom";
-
+import { useAuth } from './useAuth';
 
 export const ProtectedRoute = ({
     component: Component,
     ...rest
 }) => {
+
+    const { isAuthenticated, isLoading } = useAuth();
+
     return (
         <Route
             {...rest}
             render={props => {
-                if (localStorage.getItem("username")) {
+                if (isAuthenticated || isLoading) {
                     return <>
                         <Component {...props} />;
                     </>

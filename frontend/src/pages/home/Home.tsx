@@ -1,13 +1,15 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { Jumbotron, Container, Table } from "react-bootstrap";
+import { useAuth } from '../../components/useAuth';
 import { Summary } from '../../types/summary';
 import { secondsToString } from '../../utils/secondsToString';
 
 export const Home: React.FC = () => {
     const [summary, setSummary] = useState<Summary>();
-    
+    const { athlete } = useAuth();
+
     useEffect(() => {
         fetch('http://localhost:8080/api/athlete/summary', {
             mode: 'cors',
@@ -18,13 +20,13 @@ export const Home: React.FC = () => {
         })
             .then(x => x.json())
             .then(x => setSummary(x));
-    }, [])
+    }, []);
 
     return (
         <>
             <Jumbotron fluid>
                 <Container>
-                    <h1>Hello, {localStorage.getItem("username")}!</h1>
+                    <h1>Hello, {athlete?.name}!</h1>
                     <p>Here is a summary</p>
                 </Container>
             </Jumbotron>

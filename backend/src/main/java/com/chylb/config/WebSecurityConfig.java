@@ -29,7 +29,7 @@ public class WebSecurityConfig {
                     )
                     .csrf().disable()
                     .oauth2Login()
-                    .defaultSuccessUrl("http://localhost:3000/successfulLogin", true);
+                    .defaultSuccessUrl("http://localhost:3000/", true);
         }
 
         private AuthenticationEntryPoint getRestAuthenticationEntryPoint() {
