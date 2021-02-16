@@ -8,6 +8,7 @@ import { Statistic } from '../../components/shared/Statistic';
 import { Effort } from '../../types/efforts';
 import EffortCanvas from '../../components/shared/EffortCanvas';
 import { BasicModal } from '../../components/shared/BasicModal';
+import { useAxios } from '../../components/useAxios';
 
 export const DistancePage: React.FC<RouteComponentProps> = props => {
     const [distance, setDistance] = useState<Distance>();
@@ -17,62 +18,45 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+    const axios = useAxios();
+
     const { id } = props.match.params as any;
-    const distanceUrl = 'http://localhost:8080/api/distances/' + id;
+    const distanceUrl = '/distances/' + id;
 
     useEffect(() => {
-        fetch(distanceUrl, {
-            mode: 'cors',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-            .then(x => x.json())
-            .then(x => setDistance(x));
+        const fetchDistance = async () => {
+            const response = await axios.get(distanceUrl);
+            setDistance(response.data);
+        }
+        fetchDistance();
 
-        fetch(distanceUrl + '/efforts', {
-            mode: 'cors',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-            .then(x => x.json())
-            .then(x => setEfforts(x));
+        const fetchEfforts = async () => {
+            const response = await axios.get(distanceUrl + '/efforts');
+            setEfforts(response.data);
+        }
+        fetchEfforts();
 
-        fetch(distanceUrl + '/seasonBest?year=2020', {
-            mode: 'cors',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-            .then(x => x.json())
-            .then(x => setSeasonBest(x));
+        const fetchSeasonBest = async () => {
+            const response = await axios.get(distanceUrl + '/seasonBest?year=2020');
+            setSeasonBest(response.data);
+        }
+        fetchSeasonBest();
 
-        fetch(distanceUrl + '/allTimeBest', {
-            mode: 'cors',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-            .then(x => x.json())
-            .then(x => setAllTimeBest(x));
+        const fetchAllTimeBest = async () => {
+            const response = await axios.get(distanceUrl + '/allTimeBest');
+            setAllTimeBest(response.data);
+        }
+        fetchAllTimeBest();
+
     }, []);
 
     const deleteDistance = async (e: FormEvent) => {
         e.preventDefault();
 
         try {
-            const response = await fetch(distanceUrl, {
-                mode: 'cors',
-                credentials: 'include',
-                method: 'DELETE',
-            })
+            const response = await axios.delete(distanceUrl);
 
-            if (!response.ok) {
+            if (response.status != 200) {
                 return console.log("error");
             }
 
@@ -105,7 +89,6 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
                 </Button>
             </PageTitle>
 
-            {/* <DeleteDistanceModal show={this.state.showModal} onHide={this.hideModal} onSubmit={this.handleSubmit} /> */}
             <BasicModal visible={modalVisible}
                 title="Delete distance"
                 message="Are you sure you want to delete this distance?"

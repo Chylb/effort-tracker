@@ -5,6 +5,7 @@ import { PageTitle } from '../../components/shared/PageTitle';
 import { secondsToString } from '../../utils/secondsToString';
 import { Distance } from '../../types/distance';
 import { AddDistanceModal } from './AddDistanceModal';
+import { useAxios } from '../../components/useAxios';
 
 export const DistancesPage: React.FC = () => {
     const [distances, setDistances] = useState<Distance[]>([]);
@@ -13,20 +14,15 @@ export const DistancesPage: React.FC = () => {
 
     const [alert, setAlert] = useState({ visible: false, variant: '', heading: '', message: '' });
 
+    const axios = useAxios();
+
     useEffect(() => {
-        loadDistances();
+        fetchDistances();
     }, []);
 
-    const loadDistances = async () => {
-        fetch('http://localhost:8080/api/distances', {
-            mode: 'cors',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-            .then(x => x.json())
-            .then(x => setDistances(x));
+    const fetchDistances = async () => {
+        const response = await axios.get('/distances');
+        setDistances(response.data);
     }
 
     const handleSubmit = async (event: React.FormEvent) => {
@@ -39,24 +35,16 @@ export const DistancesPage: React.FC = () => {
         };
 
         try {
-            const response = await fetch('http://localhost:8080/api/distances', {
-                mode: 'cors',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                method: 'POST',
-                body: JSON.stringify(distance)
-            })
+            const response = await axios.post('/distances', distance);
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setAlert({
                     visible: true,
                     variant: "success",
                     heading: "Success",
                     message: "Added a new distance"
                 })
-                loadDistances();
+                fetchDistances();
             }
             else {
                 setAlert({

@@ -2,21 +2,20 @@ import React, { Component, useState, useEffect } from 'react';
 import { Jumbotron, Container, Table } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import { PageTitle } from '../../components/shared/PageTitle';
+import { useAxios } from '../../components/useAxios';
 import { Activity } from '../../types/activity';
 
 export const Activities: React.FC = () => {
     const [activities, setActivites] = useState<Activity[]>([]);
+    const axios = useAxios();
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/activities', {
-            mode: 'cors',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-            .then(x => x.json())
-            .then(x => setActivites(x));
+        const fetchData = async () => {
+            const response = await axios.get('/activities');
+            setActivites(response.data);
+        }
+
+        fetchData();
     }, [])
 
     const renderTableData = () => {

@@ -3,23 +3,21 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { Jumbotron, Container, Table } from "react-bootstrap";
 import { useAuth } from '../../components/useAuth';
+import { useAxios } from '../../components/useAxios';
 import { Summary } from '../../types/summary';
 import { secondsToString } from '../../utils/secondsToString';
 
 export const Home: React.FC = () => {
     const [summary, setSummary] = useState<Summary>();
     const { athlete } = useAuth();
+    const axios = useAxios();
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/athlete/summary', {
-            mode: 'cors',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-            .then(x => x.json())
-            .then(x => setSummary(x));
+        const fetchData = async () => {
+            const response = await axios.get('/athlete/summary');
+            setSummary(response.data);
+        }
+        fetchData();
     }, []);
 
     return (

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { Athlete } from "../types/athlete";
 import { deleteCookies } from "../utils/deleteCookies";
+import { useAxios } from "./useAxios";
 
 type AuthContextData = ReturnType<typeof useProvideAuth>;
 
@@ -20,6 +21,8 @@ const useProvideAuth = () => {
     const [isLoading, setLoading] = useState(true);
     const [isAuthenticated, setAuthenticated] = useState(false);
 
+    const axios = useAxios();
+
     const logout = () => {
         setAuthenticated(false);
         setAthlete(undefined);
@@ -29,17 +32,10 @@ const useProvideAuth = () => {
     useEffect(() => {
         const initAuth = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/athlete', {
-                    mode: 'cors',
-                    credentials: 'include',
-                    headers: {
-                        'Accept': 'application/json',
-                    }
-                });
+                const response = await axios.get('/athlete');
 
-                if (response.ok) {
-                    const athlete = await response.json();
-                    setAthlete(athlete);
+                if (response.status === 200) {
+                    setAthlete(response.data);
                     setAuthenticated(true);
                 }
             }

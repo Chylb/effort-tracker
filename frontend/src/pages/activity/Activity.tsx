@@ -5,6 +5,7 @@ import { Link, RouteComponentProps } from 'react-router-dom';
 import { BasicModal } from '../../components/shared/BasicModal';
 import { PageTitle } from '../../components/shared/PageTitle';
 import { Statistic } from '../../components/shared/Statistic';
+import { useAxios } from '../../components/useAxios';
 import { Activity } from '../../types/activity';
 import { Effort } from '../../types/efforts';
 import { secondsToString } from '../../utils/secondsToString';
@@ -15,29 +16,24 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+    const axios = useAxios();
+
     const { id } = props.match.params as any;
-    const activityUrl = 'http://localhost:8080/api/activities/' + id;
+    const activityUrl = '/activities/' + id;
 
     useEffect(() => {
-        fetch(activityUrl, {
-            mode: 'cors',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-            .then(x => x.json())
-            .then(x => setActivity(x));
+        const fetchActivity = async () => {
+            const response = await axios.get(activityUrl);
+            setActivity(response.data);
+        }
+        fetchActivity();
 
-        fetch(activityUrl + '/efforts', {
-            mode: 'cors',
-            credentials: 'include',
-            headers: {
-                'Accept': 'application/json',
-            }
-        })
-            .then(x => x.json())
-            .then(x => setEfforts(x));
+        const fetchEfforts = async () => {
+            const response = await axios.get(activityUrl + '/efforts');
+            setEfforts(response.data);
+        }
+        fetchEfforts();
+
     }, []);
 
     const flagActivity = async (e: FormEvent) => {
@@ -47,17 +43,9 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
         setModalVisible(false);
 
         try {
-            const response = await fetch('http://localhost:8080/api/activities/' + id, {
-                mode: 'cors',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                method: 'PATCH',
-                body: JSON.stringify({ flagged: !activity.flagged })
-            })
+            const response = await axios.patch(activityUrl, { flagged: !activity.flagged });
 
-            if (response.ok) {
+            if (response.status === 200) {
                 setActivity({
                     ...activity, flagged: !activity.flagged
                 });
