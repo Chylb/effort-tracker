@@ -7,7 +7,7 @@ import { PageTitle } from '../../components/shared/PageTitle';
 import { Statistic } from '../../components/shared/Statistic';
 import { useAxios } from '../../components/useAxios';
 import { Activity } from '../../types/activity';
-import { Effort } from '../../types/efforts';
+import { Effort } from '../../types/effort';
 import { secondsToString } from '../../utils/secondsToString';
 
 export const ActivityPage: React.FC<RouteComponentProps> = props => {

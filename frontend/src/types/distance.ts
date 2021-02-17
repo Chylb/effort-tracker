@@ -1,4 +1,4 @@
-import { Effort } from "./efforts";
+import { Effort } from "./effort";
 
 export interface Distance {
     id: number;

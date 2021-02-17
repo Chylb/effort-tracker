@@ -5,7 +5,7 @@ import { PageTitle } from '../../components/shared/PageTitle';
 import { secondsToString } from '../../utils/secondsToString';
 import { Distance } from '../../types/distance';
 import { Statistic } from '../../components/shared/Statistic';
-import { Effort } from '../../types/efforts';
+import { Effort } from '../../types/effort';
 import EffortCanvas from '../../components/shared/EffortCanvas';
 import { BasicModal } from '../../components/shared/BasicModal';
 import { useAxios } from '../../components/useAxios';

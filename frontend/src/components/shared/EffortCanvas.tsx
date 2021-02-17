@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Chart, { ChartConfiguration } from 'chart.js';
 import { secondsToString } from '../../utils/secondsToString';
-import { Effort } from '../../types/efforts';
+import { Effort } from '../../types/effort';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 
 interface Props extends RouteComponentProps {
