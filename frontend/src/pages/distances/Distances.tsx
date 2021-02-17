@@ -67,13 +67,13 @@ export const DistancesPage: React.FC = () => {
 
     const renderTableData = () => {
         return distances.map((distance) => {
-            const { id, name, length, bestTime, effortCount } = distance
+            const { id, name, length, bestEffort, effortCount } = distance
             return (
                 <tr key={id}>
-                    <td><Link to={"distances/" + id}>{name}</Link></td>
+                    <td><Link to={'distances/' + id}>{name}</Link></td>
                     <td>{effortCount}</td>
-                    <td>{secondsToString(bestTime)}</td>
-                    <td>{secondsToString(bestTime * 1000 / length)}</td>
+                    <td><Link to={'activities/' + bestEffort?.activity.id}>{secondsToString(bestEffort?.time)}</Link></td>
+                    <td>{secondsToString(bestEffort?.time * 1000 / length)}</td>
                 </tr>
             )
         })

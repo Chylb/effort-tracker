@@ -51,7 +51,8 @@ public class AthleteController {
 
         int bestPace = 0;
         if (distances.size() > 0)
-            bestPace = (int) Math.ceil(distances.get(0).getBestTime() / distances.get(0).getLength() * 1000);
+            if (distances.get(0).getBestEffort() != null)
+                bestPace = (int) ((int) Math.ceil(distances.get(0).getBestEffort().getTime()) / distances.get(0).getLength() * 1000);
 
         ObjectNode summary = objectMapper.createObjectNode();
         summary.put("distances", distances.size());

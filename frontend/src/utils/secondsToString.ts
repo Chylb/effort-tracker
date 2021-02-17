@@ -1,4 +1,7 @@
 export const secondsToString = (seconds: number) => {
+    if (isNaN(seconds))
+        return "";
+
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds - 3600 * h) / 60);
     const s = Math.ceil(seconds - 3600 * h - 60 * m);

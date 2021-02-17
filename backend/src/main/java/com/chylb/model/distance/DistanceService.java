@@ -91,15 +91,18 @@ public class DistanceService {
     private void recalculateDistanceStatistics(Distance distance) {
         int effortCount = 0;
         int bestTime = Integer.MAX_VALUE;
+        Effort bestEffort = null;
 
         for (Effort effort : effortRepository.getUnflaggedEffortsByDistanceId(distance.getId())) {
             effortCount++;
-            if (effort.getTime() < bestTime)
+            if (effort.getTime() < bestTime) {
                 bestTime = effort.getTime();
+                bestEffort = effort;
+            }
         }
 
         distance.setEffortCount(effortCount);
-        distance.setBestTime(bestTime);
+        distance.setBestEffort(bestEffort);
 
         distanceRepository.save(distance);
     }
@@ -107,24 +110,25 @@ public class DistanceService {
     private void addEfforts(Distance distance) {
         List<Activity> activities = activityRepository.getActivitiesByAthleteId(distance.getAthlete().getId());
 
+        int effortCount = 0;
+        int bestTime = Integer.MAX_VALUE;
+        Effort bestEffort = null;
+
         for (Activity activity : activities) {
             activity.loadActivityStream();
             Effort effort = activity.calculateEffort(distance);
             if (effort == null)
                 continue;
 
-            int effortCount = distance.getEffortCount();
-            if (effortCount == 0) {
-                distance.setEffortCount(1);
-                distance.setBestTime(effort.getTime());
-            } else {
-                distance.setEffortCount(effortCount + 1);
-                int bestTime = distance.getBestTime();
-                if (effort.getTime() < bestTime)
-                    distance.setBestTime(effort.getTime());
+            effortCount++;
+            if(effort.getTime() < bestTime) {
+                bestTime = effort.getTime();
+                bestEffort = effort;
             }
             effortRepository.save(effort);
         }
+        distance.setEffortCount(effortCount);
+        distance.setBestEffort(bestEffort);
     }
 
     private long athleteId() {
