@@ -24,7 +24,8 @@ public class EffortService {
         List<Distance> distances = distanceRepository.getDistancesByAthleteId(activity.getAthlete().getId());
         for (Distance distance : distances) {
             Effort effort = Effort.calculateEffort(activity, distance);
-            effortRepository.save(effort);
+            if(effort != null)
+                effortRepository.save(effort);
         }
     }
 
@@ -50,5 +51,13 @@ public class EffortService {
         }
         distance.setEffortCount(effortCount);
         distance.setBestEffort(bestEffort);
+    }
+
+    public void deleteEfforts(Activity activity) {
+        for(Effort effort: effortRepository.getEffortsByActivityId(activity.getId())) {
+            if(effort.getDistance().getBestEffort() == effort)
+                effort.getDistance().setBestEffort(null);
+            effortRepository.delete(effort);
+        }
     }
 }

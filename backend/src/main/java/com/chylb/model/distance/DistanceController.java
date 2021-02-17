@@ -30,7 +30,7 @@ public class DistanceController {
     @GetMapping("/{id}/efforts")
     public List<Effort> getDistanceEfforts(@PathVariable(value = "id") Long id) {
         Distance distance = distanceService.getDistance(id);
-        return effortRepository.getUnflaggedEffortsByDistanceId(id);
+        return effortRepository.getEffortsByDistanceId(id);
     }
 
     @GetMapping("/{id}/seasonBest")

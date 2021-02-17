@@ -28,13 +28,13 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
         }
         fetchActivity();
 
-        const fetchEfforts = async () => {
-            const response = await axios.get(activityUrl + '/efforts');
-            setEfforts(response.data);
-        }
         fetchEfforts();
-
     }, []);
+
+    const fetchEfforts = async () => {
+        const response = await axios.get(activityUrl + '/efforts');
+        setEfforts(response.data);
+    }
 
     const flagActivity = async (e: FormEvent) => {
         if (!activity)
@@ -46,6 +46,7 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
             const response = await axios.patch(activityUrl, { flagged: !activity.flagged });
 
             if (response.status === 200) {
+                fetchEfforts();
                 setActivity({
                     ...activity, flagged: !activity.flagged
                 });

@@ -5,7 +5,9 @@ import com.chylb.exceptions.ForbiddenException;
 import com.chylb.exceptions.NotFoundException;
 import com.chylb.model.athlete.Athlete;
 import com.chylb.model.athlete.AthleteRepository;
+import com.chylb.model.distance.Distance;
 import com.chylb.model.distance.DistanceService;
+import com.chylb.model.effort.Effort;
 import com.chylb.model.effort.EffortService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -62,6 +64,13 @@ public class ActivityService {
 
         activity.setFlagged(flag);
         activityRepository.save(activity);
+
+        if(!flag) {
+            activity.loadActivityStream();
+            effortService.generateEfforts(activity);
+        }
+        else
+            effortService.deleteEfforts(activity);
 
         distanceService.recalculateDistancesStatistics();
     }
