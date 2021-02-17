@@ -90,50 +90,6 @@ public class Activity {
             e.printStackTrace();
         }
     }
-
-    public Effort calculateEffort(Distance distance) {
-        if (distance.getLength() > this.distance)
-            return null;
-
-        Iterator<Integer> tIt0 = streamTime.listIterator();
-        Iterator<Float> dIt0 = streamDistance.listIterator();
-        Iterator<Integer> tIt = streamTime.listIterator();
-        Iterator<Float> dIt = streamDistance.listIterator();
-
-        float d0 = dIt0.next();
-        float d1 = dIt.next();
-        int t0 = tIt0.next();
-        int t1 = tIt.next();
-
-        int time;
-        int bestTime = Integer.MAX_VALUE;
-
-        while (dIt.hasNext()) {
-            while (dIt.hasNext() && d1 - d0 < distance.getLength()) {
-                d1 = dIt.next();
-                t1 = tIt.next();
-            }
-
-            if (!dIt.hasNext())
-                break;
-
-            time = t1 - t0;
-            if (time < bestTime)
-                bestTime = time;
-
-            d0 = dIt0.next();
-            t0 = tIt0.next();
-        }
-
-        if (bestTime == Integer.MAX_VALUE)
-            bestTime = streamTime.get(streamTime.size() - 1);
-
-        Effort effort = new Effort();
-        effort.setDistance(distance);
-        effort.setActivity(this);
-        effort.setTime(bestTime);
-        return effort;
-    }
 }
 
 

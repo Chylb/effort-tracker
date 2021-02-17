@@ -6,6 +6,7 @@ import com.chylb.exceptions.NotFoundException;
 import com.chylb.model.athlete.Athlete;
 import com.chylb.model.athlete.AthleteRepository;
 import com.chylb.model.distance.DistanceService;
+import com.chylb.model.effort.EffortService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,13 +28,15 @@ public class ActivityService {
     private final DistanceService distanceService;
     private final ActivityRepository activityRepository;
     private final AthleteRepository athleteRepository;
+    private final EffortService effortService;
     private final ApiRequester apiRequester;
     private final ObjectMapper objectMapper;
 
-    public ActivityService(DistanceService distanceService, ActivityRepository activityRepository, AthleteRepository athleteRepository, ApiRequester apiRequester, ObjectMapper objectMapper) {
+    public ActivityService(DistanceService distanceService, ActivityRepository activityRepository, AthleteRepository athleteRepository, EffortService effortService, ApiRequester apiRequester, ObjectMapper objectMapper) {
         this.distanceService = distanceService;
         this.activityRepository = activityRepository;
         this.athleteRepository = athleteRepository;
+        this.effortService = effortService;
         this.apiRequester = apiRequester;
         this.objectMapper = objectMapper;
     }
@@ -120,7 +123,7 @@ public class ActivityService {
 
     private void addActivity(Activity activity) {
         activityRepository.save(activity);
-        distanceService.addActivityEfforts(activity);
+        effortService.generateEfforts(activity);
     }
 
     private long athleteId() {

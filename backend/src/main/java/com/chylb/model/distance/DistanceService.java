@@ -3,12 +3,12 @@ package com.chylb.model.distance;
 import com.chylb.exceptions.ForbiddenException;
 import com.chylb.exceptions.NotFoundException;
 import com.chylb.exceptions.UnprocessableEntityException;
-import com.chylb.model.activity.Activity;
 import com.chylb.model.activity.ActivityRepository;
 import com.chylb.model.athlete.Athlete;
 import com.chylb.model.athlete.AthleteRepository;
 import com.chylb.model.effort.Effort;
 import com.chylb.model.effort.EffortRepository;
+import com.chylb.model.effort.EffortService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
@@ -21,14 +21,14 @@ import java.util.stream.Collectors;
 public class DistanceService {
     private final DistanceRepository distanceRepository;
     private final AthleteRepository athleteRepository;
-    private final ActivityRepository activityRepository;
     private final EffortRepository effortRepository;
+    private final EffortService effortService;
 
-    public DistanceService(DistanceRepository distanceRepository, AthleteRepository athleteRepository, ActivityRepository activityRepository, EffortRepository effortRepository) {
+    public DistanceService(DistanceRepository distanceRepository, AthleteRepository athleteRepository, EffortRepository effortRepository, EffortService effortService) {
         this.distanceRepository = distanceRepository;
         this.athleteRepository = athleteRepository;
-        this.activityRepository = activityRepository;
         this.effortRepository = effortRepository;
+        this.effortService = effortService;
     }
 
     public List<Distance> getDistances() {
@@ -59,7 +59,7 @@ public class DistanceService {
         newDistance.setAthlete(athlete);
 
         Distance savedDistance = distanceRepository.save(newDistance);
-        addEfforts(savedDistance);
+        effortService.generateEfforts(savedDistance);
         return savedDistance;
     }
 
@@ -76,15 +76,6 @@ public class DistanceService {
     public void recalculateDistancesStatistics() {
         for (Distance distance : distanceRepository.getDistancesByAthleteId(athleteId())) {
             recalculateDistanceStatistics(distance);
-        }
-    }
-
-    @Transactional
-    public void addActivityEfforts(Activity activity) {
-        List<Distance> distances = distanceRepository.getDistancesByAthleteId(activity.getAthlete().getId());
-        for (Distance distance : distances) {
-            Effort effort = activity.calculateEffort(distance);
-            effortRepository.save(effort);
         }
     }
 
@@ -105,30 +96,6 @@ public class DistanceService {
         distance.setBestEffort(bestEffort);
 
         distanceRepository.save(distance);
-    }
-
-    private void addEfforts(Distance distance) {
-        List<Activity> activities = activityRepository.getActivitiesByAthleteId(distance.getAthlete().getId());
-
-        int effortCount = 0;
-        int bestTime = Integer.MAX_VALUE;
-        Effort bestEffort = null;
-
-        for (Activity activity : activities) {
-            activity.loadActivityStream();
-            Effort effort = activity.calculateEffort(distance);
-            if (effort == null)
-                continue;
-
-            effortCount++;
-            if(effort.getTime() < bestTime) {
-                bestTime = effort.getTime();
-                bestEffort = effort;
-            }
-            effortRepository.save(effort);
-        }
-        distance.setEffortCount(effortCount);
-        distance.setBestEffort(bestEffort);
     }
 
     private long athleteId() {
