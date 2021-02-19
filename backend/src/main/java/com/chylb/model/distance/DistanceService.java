@@ -21,13 +21,11 @@ import java.util.stream.Collectors;
 public class DistanceService {
     private final DistanceRepository distanceRepository;
     private final AthleteRepository athleteRepository;
-    private final EffortRepository effortRepository;
     private final EffortService effortService;
 
-    public DistanceService(DistanceRepository distanceRepository, AthleteRepository athleteRepository, EffortRepository effortRepository, EffortService effortService) {
+    public DistanceService(DistanceRepository distanceRepository, AthleteRepository athleteRepository, EffortService effortService) {
         this.distanceRepository = distanceRepository;
         this.athleteRepository = athleteRepository;
-        this.effortRepository = effortRepository;
         this.effortService = effortService;
     }
 
@@ -65,10 +63,7 @@ public class DistanceService {
 
     @Transactional
     public void deleteDistance(Distance distance) {
-        List<Effort> efforts = effortRepository.getEffortsByDistanceId(distance.getId());
-        for (Effort e : efforts)
-            effortRepository.delete(e);
-
+        effortService.deleteEfforts(distance);
         distanceRepository.delete(distance);
     }
 
@@ -84,7 +79,7 @@ public class DistanceService {
         int bestTime = Integer.MAX_VALUE;
         Effort bestEffort = null;
 
-        for (Effort effort : effortRepository.getEffortsByDistanceId(distance.getId())) {
+        for (Effort effort : effortService.getEfforts(distance)) {
             effortCount++;
             if (effort.getTime() < bestTime) {
                 bestTime = effort.getTime();

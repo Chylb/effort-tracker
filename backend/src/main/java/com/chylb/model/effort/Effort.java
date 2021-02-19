@@ -3,10 +3,7 @@ package com.chylb.model.effort;
 import com.chylb.model.activity.Activity;
 import com.chylb.model.distance.Distance;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -34,6 +31,10 @@ public class Effort {
     private Distance distance;
 
     private int time;
+
+    private int ordinal;
+
+    private int rank;
 
     public static Effort calculateEffort(Activity activity, Distance distance) {
         if (distance.getLength() > activity.getDistance())

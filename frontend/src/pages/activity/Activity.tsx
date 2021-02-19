@@ -8,6 +8,7 @@ import { Statistic } from '../../components/shared/Statistic';
 import { useAxios } from '../../components/useAxios';
 import { Activity } from '../../types/activity';
 import { Effort } from '../../types/effort';
+import { number2emoji } from '../../utils/emoji';
 import { secondsToString } from '../../utils/secondsToString';
 
 export const ActivityPage: React.FC<RouteComponentProps> = props => {
@@ -57,11 +58,25 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
         }
     }
 
+    const rank2description = (rank: number) => {
+        switch (rank) {
+            case 1:
+                return "Personal record"
+            case 2:
+                return "2nd fastest time"
+            case 3:
+                return "3rd fastest time"
+            default:
+                return "";
+        }
+    }
+
     const renderTableData = () => {
         return efforts.map((effort) => {
-            const { id, distance, time } = effort;
+            const { id, distance, time, rank, ordinal } = effort;
             return (
                 <tr key={id}>
+                    <td>{ordinal > rank ? <div title={rank2description(rank + 1)}>{number2emoji(rank + 1)}</div> : ""}</td>
                     <td><Link to={'/distances/' + distance.id} >{distance.name}</Link></td>
                     <td>{secondsToString(time)}</td>
                     <td>{secondsToString(time * 1000 / distance.length)}</td>
@@ -90,6 +105,7 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
                 <table className="table table-striped">
                     <thead>
                         <tr>
+                            <th scope="col"></th>
                             <th scope="col">Distance</th>
                             <th scope="col">Time</th>
                             <th scope="col">Pace</th>

@@ -6,4 +6,6 @@ export interface Effort {
     activity: Activity;
     distance: Distance;
     time: number;
+    ordinal: number;
+    rank: number;
 }
