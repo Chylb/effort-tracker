@@ -8,7 +8,7 @@ import { DistancesPage } from './pages/distances/Distances';
 import { Home } from './pages/home/Home';
 import { Login } from './pages/login/Login';
 import { Error } from './pages/error/Error';
-import { AuthProvider } from './components/useAuth';
+import { AuthProvider } from './hooks/useAuth';
 import { Header } from './components/parts/Header';
 import { Footer } from './components/parts/Footer';
 

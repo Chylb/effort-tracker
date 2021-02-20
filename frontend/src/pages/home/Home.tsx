@@ -2,8 +2,8 @@ import React from 'react';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { Jumbotron, Container, Table } from "react-bootstrap";
-import { useAuth } from '../../components/useAuth';
-import { useAxios } from '../../components/useAxios';
+import { useAuth } from '../../hooks/useAuth';
+import { useAxios } from '../../hooks/useAxios';
 import { Summary } from '../../types/summary';
 import { secondsToString } from '../../utils/secondsToString';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Nav, Dropdown, NavItem, NavLink } from "react-bootstrap";
-import { useAuth } from '../useAuth';
+import { useAuth } from '../../hooks/useAuth';
 import { LoginHeader } from './LoginHeader';
 
 export const Header: React.FC = () => {

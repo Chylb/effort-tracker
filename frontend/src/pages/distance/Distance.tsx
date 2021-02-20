@@ -8,7 +8,7 @@ import { Statistic } from '../../components/shared/Statistic';
 import { Effort } from '../../types/effort';
 import EffortCanvas from '../../components/shared/EffortCanvas';
 import { BasicModal } from '../../components/shared/BasicModal';
-import { useAxios } from '../../components/useAxios';
+import { useAxios } from '../../hooks/useAxios';
 
 export const DistancePage: React.FC<RouteComponentProps> = props => {
     const [distance, setDistance] = useState<Distance>();

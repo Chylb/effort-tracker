@@ -5,7 +5,7 @@ import { PageTitle } from '../../components/shared/PageTitle';
 import { secondsToString } from '../../utils/secondsToString';
 import { Distance } from '../../types/distance';
 import { AddDistanceModal } from './AddDistanceModal';
-import { useAxios } from '../../components/useAxios';
+import { useAxios } from '../../hooks/useAxios';
 
 export const DistancesPage: React.FC = () => {
     const [distances, setDistances] = useState<Distance[]>([]);

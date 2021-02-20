@@ -2,7 +2,7 @@ import React, { Component, useState, useEffect } from 'react';
 import { Jumbotron, Container, Table } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import { PageTitle } from '../../components/shared/PageTitle';
-import { useAxios } from '../../components/useAxios';
+import { useAxios } from '../../hooks/useAxios';
 import { Activity } from '../../types/activity';
 
 export const Activities: React.FC = () => {

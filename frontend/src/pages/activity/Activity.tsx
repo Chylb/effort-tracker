@@ -5,7 +5,7 @@ import { Link, RouteComponentProps } from 'react-router-dom';
 import { BasicModal } from '../../components/shared/BasicModal';
 import { PageTitle } from '../../components/shared/PageTitle';
 import { Statistic } from '../../components/shared/Statistic';
-import { useAxios } from '../../components/useAxios';
+import { useAxios } from '../../hooks/useAxios';
 import { Activity } from '../../types/activity';
 import { Effort } from '../../types/effort';
 import { number2emoji } from '../../utils/emoji';
