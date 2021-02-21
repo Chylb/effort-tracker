@@ -1,5 +1,5 @@
-import React, { Component, useState, useEffect } from 'react';
-import { Jumbotron, Container, Table } from "react-bootstrap";
+import React, { useState, useEffect } from 'react';
+import { Container } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import { PageTitle } from '../../components/shared/PageTitle';
 import { useAxios } from '../../hooks/useAxios';
@@ -7,13 +7,17 @@ import { Activity } from '../../types/activity';
 
 export const Activities: React.FC = () => {
     const [activities, setActivites] = useState<Activity[]>([]);
+
+    const [sortKey, setSortKey] = useState<string>('');
+    const [sortReversed, setSortReversed] = useState<boolean>(false);
+
     const axios = useAxios();
 
     useEffect(() => {
         const fetchData = async () => {
             const response = await axios.get('/activities');
             setActivites(response.data);
-        }
+        };
 
         fetchData();
     }, [])
@@ -31,6 +35,32 @@ export const Activities: React.FC = () => {
         })
     };
 
+    const sortTable = (key: 'distance' | 'name' | 'date') => {
+        let reversed = false;
+        if (key === sortKey)
+            reversed = !sortReversed;
+
+        let sorted: Activity[];
+
+        switch (key) {
+            case 'distance':
+                sorted = [...activities].sort((a, b) => a[key] - b[key]);
+                break;
+            case 'name':
+                sorted = [...activities].sort((a, b) => a[key].localeCompare(b[key]));
+                break;
+            case 'date':
+                sorted = [...activities].sort((a, b) => new Date(a[key]).valueOf() - new Date(b[key]).valueOf());
+                break;
+        }
+        if (reversed)
+            sorted.reverse();
+
+        setActivites(sorted);
+        setSortKey(key);
+        setSortReversed(reversed);
+    };
+
     return (
         <>
             <PageTitle title="My activities" />
@@ -39,13 +69,13 @@ export const Activities: React.FC = () => {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Distance</th>
-                            <th scope="col">Date</th>
+                            <th scope="col" onClick={() => { sortTable('name') }}>Name</th>
+                            <th scope="col" onClick={() => { sortTable('distance') }}>Distance</th>
+                            <th scope="col" onClick={() => { sortTable('date') }}>Date</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {activities && renderTableData()}
+                        {renderTableData()}
                     </tbody>
                 </table>
             </Container>

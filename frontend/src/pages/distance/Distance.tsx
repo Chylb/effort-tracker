@@ -18,6 +18,9 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+    const [sortKey, setSortKey] = useState<string>('');
+    const [sortReversed, setSortReversed] = useState<boolean>(false);
+
     const axios = useAxios();
 
     const { id } = props.match.params as any;
@@ -81,6 +84,32 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
         })
     }
 
+    const sortTable = (key: 'name' | 'date' | 'time') => {
+        let reversed = false;
+        if (key === sortKey)
+            reversed = !sortReversed;
+
+        let sorted: Effort[];
+
+        switch (key) {
+            case 'time':
+                sorted = [...efforts].sort((a, b) => a[key] - b[key]);
+                break;
+            case 'name':
+                sorted = [...efforts].sort((a, b) => a.activity[key].localeCompare(b.activity[key]));
+                break;
+            case 'date':
+                sorted = [...efforts].sort((a, b) => new Date(a.activity[key]).valueOf() - new Date(b.activity[key]).valueOf());
+                break;
+        }
+        if (reversed)
+            sorted.reverse();
+
+        setEfforts(sorted);
+        setSortKey(key);
+        setSortReversed(reversed);
+    };
+
     return (
         <>
             <PageTitle title={distance ? distance.name : ''} >
@@ -107,14 +136,14 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">Activity</th>
-                            <th scope="col">Date</th>
-                            <th scope="col">Time</th>
-                            <th scope="col">Pace</th>
+                            <th scope="col" onClick={() => { sortTable('name') }}>Activity</th>
+                            <th scope="col" onClick={() => { sortTable('date') }}>Date</th>
+                            <th scope="col" onClick={() => { sortTable('time') }}>Time</th>
+                            <th scope="col" onClick={() => { sortTable('time') }}>Pace</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {efforts && renderTableData()}
+                        {renderTableData()}
                     </tbody>
                 </table>
             </Statistic>
