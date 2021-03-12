@@ -10,7 +10,7 @@ export const Header: React.FC = () => {
 	return (
 		<> { isAuthenticated || isLoading ?
 			<Navbar bg="dark" variant="dark" expand="md" className="p-0 mb-3">
-				<Navbar.Brand as={Link} to="/home" className="p-0" > <img src="/logo.png" height="56" alt="logo" /> </Navbar.Brand>
+				<Navbar.Brand as={Link} to="/home" className="p-0" > <img src={process.env.PUBLIC_URL + "/logo.png"} height="56" alt="logo" /> </Navbar.Brand>
 				<Navbar.Toggle aria-controls="responsive-navbar-nav" />
 				<Navbar.Collapse id="responsive-navbar-nav">
 					<Nav className="mr-auto">
@@ -36,7 +36,7 @@ export const Header: React.FC = () => {
 								</Dropdown.Menu>
 							</Dropdown>
 
-							<a href="https://www.strava.com"><img src="/powered_by_strava.svg" height="56" alt="strava" /></a>
+							<a href="https://www.strava.com"><img src={process.env.PUBLIC_URL + "/powered_by_strava.svg"} height="56" alt="strava" /></a>
 						</Nav>
 					}
 				</Navbar.Collapse>
