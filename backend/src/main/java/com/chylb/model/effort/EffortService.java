@@ -30,6 +30,7 @@ public class EffortService {
 
     @Transactional
     public void generateEfforts(Activity activity) {
+        activity.loadActivityStream();
         List<Distance> distances = distanceRepository.getDistancesByAthleteId(activity.getAthlete().getId());
         for (Distance distance : distances) {
             Effort effort = Effort.calculateEffort(activity, distance);

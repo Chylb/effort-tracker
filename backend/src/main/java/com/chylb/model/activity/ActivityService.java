@@ -135,6 +135,18 @@ public class ActivityService {
         effortService.generateEfforts(activity);
     }
 
+    void addGeneratedActivity(Activity activity) {
+        Athlete athlete = athleteRepository.getAthleteById( athleteId());
+        activity.setAthlete( athlete);
+        int id = 0;
+        while(activityRepository.getActivityById(id) != null)
+            id++;
+        activity.setId(id);
+        activity.setName("generated activity " + id);
+
+        addActivity(activity);
+    }
+
     private long athleteId() {
         DefaultOAuth2User user = (DefaultOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return Long.parseLong(user.getName());

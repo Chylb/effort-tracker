@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import { PageTitle } from '../../components/shared/PageTitle';
 import { useAxios } from '../../hooks/useAxios';
@@ -78,8 +78,9 @@ export const Activities: React.FC = () => {
                         {renderTableData()}
                     </tbody>
                 </table>
+                <Button variant="outline-secondary" size="sm" className='float-right' onClick={() => axios.post('/activities')}>DEV generate activity</Button>
             </Container>
         </>
-    );
+    )
 }
 

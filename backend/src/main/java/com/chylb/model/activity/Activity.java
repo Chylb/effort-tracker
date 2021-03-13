@@ -1,26 +1,20 @@
 package com.chylb.model.activity;
 
 import com.chylb.model.athlete.Athlete;
-import com.chylb.model.distance.Distance;
-import com.chylb.model.effort.Effort;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
-import java.util.*;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.InflaterOutputStream;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,7 +22,7 @@ import java.util.zip.InflaterOutputStream;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-@JsonIgnoreProperties(value = {"athlete", "activityStreamJson", "streamTime", "streamDistance", "manual"})
+@JsonIgnoreProperties(value = {"athlete", "streamTime", "streamDistance", "manual"})
 public class Activity {
     @Id
     private long id;
@@ -45,6 +39,7 @@ public class Activity {
     private boolean flagged;
 
     @Lob
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private byte[] activityStreamJson;
 
     @Transient
