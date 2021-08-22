@@ -11,6 +11,8 @@ import { Effort } from '../../types/effort';
 import { number2emoji } from '../../utils/emoji';
 import { secondsToString } from '../../utils/secondsToString';
 
+import { ActivityMap } from '../../components/shared/ActivityMap';
+
 export const ActivityPage: React.FC<RouteComponentProps> = props => {
     const [activity, setActivity] = useState<Activity>();
     const [efforts, setEfforts] = useState<Effort[]>([]);
@@ -116,6 +118,8 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
                     </tbody>
                 </table>
             </Statistic>
+
+            {activity && <ActivityMap polyline={activity.polyline} />}
         </>
     );
 }

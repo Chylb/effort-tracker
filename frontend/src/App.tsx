@@ -14,6 +14,7 @@ import { Footer } from './components/parts/Footer';
 
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 const App: React.FC = () => {
   document.title = "Effort tracker";

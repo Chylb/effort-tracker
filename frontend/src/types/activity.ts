@@ -3,5 +3,6 @@ export interface Activity {
     name: string;
     distance: number;
     date: string;
+    polyline: string;
     flagged: boolean;
 }

@@ -30,6 +30,9 @@ public class Activity {
     private float distance;
     private String type;
 
+    @Lob
+    private String polyline;
+
     @Temporal(TemporalType.TIMESTAMP)
     private java.util.Date date;
 
@@ -57,6 +60,7 @@ public class Activity {
         a.setName(node.get("name").asText());
         a.setDistance((float) node.get("distance").asDouble());
         a.setType(node.get("type").asText());
+        a.setPolyline(node.get("map").get("summary_polyline").asText());
         a.setManual(node.get("manual").asBoolean());
         a.setFlagged(false);
 
