@@ -43,7 +43,7 @@ public class Activity {
 
     @Lob
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private byte[] activityStreamJson;
+    private String activityStreamJson;
 
     @Transient
     private List<Integer> streamTime;

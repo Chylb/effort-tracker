@@ -34,6 +34,11 @@ public class ActivityController {
         return activityService.getActivity(id);
     }
 
+    @GetMapping("/{id}/streams")
+    public String getActivityStreams(@PathVariable(value = "id") Long id) {
+        return activityService.getActivityStreams(id);
+    }
+
     @GetMapping("/{id}/efforts")
     public List<Effort> getActivityEfforts(@PathVariable(value = "id") Long id) {
         Activity activity = activityService.getActivity(id);
@@ -83,7 +88,7 @@ public class ActivityController {
         ObjectNode streamData = objectMapper.createObjectNode();
         streamData.put("time", timeData);
         streamData.put("distance", distanceData);
-        activity.setActivityStreamJson(streamData.toString().getBytes());
+        activity.setActivityStreamJson(streamData.toString());
 
         activity.setDistance(length);
         activity.setType("Run");

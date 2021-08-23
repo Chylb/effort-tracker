@@ -8,4 +8,6 @@ export interface Effort {
     time: number;
     ordinal: number;
     rank: number;
+    ix0: number;
+    ix1: number;
 }

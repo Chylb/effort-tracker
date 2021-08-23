@@ -57,6 +57,16 @@ public class ActivityService {
         return activity;
     }
 
+    public String getActivityStreams(long id) {
+        Activity activity = activityRepository.getActivityById(id);
+        if (activity == null)
+            throw new NotFoundException("Activity not found");
+        if (activity.getAthlete().getId() != athleteId())
+            throw new ForbiddenException("Access denied");
+
+        return activity.getActivityStreamJson();
+    }
+
     @Transactional
     public void setFlagged(Activity activity, boolean flag) {
         if (activity.isFlagged() == flag)
@@ -110,12 +120,12 @@ public class ActivityService {
 
         for (Activity activity : newActivities) {
             String uri = UriComponentsBuilder.newInstance().scheme("https").host("www.strava.com").path("/api/v3/activities/" + activity.getId() + "/streams")
-                    .queryParam("keys", "time,distance")
+                    .queryParam("keys", "time,distance,latlng,altitude")
                     .queryParam("key_by_type", true)
                     .toUriString();
 
             ResponseEntity<String> response = apiRequester.sendGetRequest(client, uri);
-            activity.setActivityStreamJson(response.getBody().getBytes());
+            activity.setActivityStreamJson(response.getBody());
 
             //Thread.sleep(9500);
             Thread.sleep(100);

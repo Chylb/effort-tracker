@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FormEvent } from 'react';
 import { Button } from "react-bootstrap";
 import { Link, RouteComponentProps } from 'react-router-dom';
@@ -12,10 +12,13 @@ import { number2emoji } from '../../utils/emoji';
 import { secondsToString } from '../../utils/secondsToString';
 
 import { ActivityMap } from '../../components/shared/ActivityMap';
+import { ActivityStreams } from '../../types/activityStreams';
 
 export const ActivityPage: React.FC<RouteComponentProps> = props => {
     const [activity, setActivity] = useState<Activity>();
+    const [activityStreams, setActivityStreams] = useState<ActivityStreams>();
     const [efforts, setEfforts] = useState<Effort[]>([]);
+    const [selectedEffort, setSelectedEffort] = useState<Effort>();
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
 
@@ -25,18 +28,34 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
     const activityUrl = '/activities/' + id;
 
     useEffect(() => {
-        const fetchActivity = async () => {
-            const response = await axios.get(activityUrl);
-            setActivity(response.data);
-        }
         fetchActivity();
-
         fetchEfforts();
+        fetchStreams();
+
+        const checkIfClickedOutside = (e: MouseEvent) => {
+            if ((e.target as HTMLElement).id == 'root') {
+                setSelectedEffort(undefined);
+            }
+        }
+        document.addEventListener("click", checkIfClickedOutside)
+        return () => {
+            document.removeEventListener("click", checkIfClickedOutside)
+        }
     }, []);
+
+    const fetchActivity = async () => {
+        const response = await axios.get(activityUrl);
+        setActivity(response.data);
+    }
 
     const fetchEfforts = async () => {
         const response = await axios.get(activityUrl + '/efforts');
         setEfforts(response.data);
+    }
+
+    const fetchStreams = async () => {
+        const response = await axios.get(activityUrl + '/streams');
+        setActivityStreams(response.data);
     }
 
     const flagActivity = async (e: FormEvent) => {
@@ -77,9 +96,9 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
         return efforts.map((effort) => {
             const { id, distance, time, rank, ordinal } = effort;
             return (
-                <tr key={id}>
+                <tr key={id} onClick={() => setSelectedEffort(effort)}>
                     <td>{ordinal > rank ? <div title={rank2description(rank + 1)}>{number2emoji(rank + 1)}</div> : ""}</td>
-                    <td><Link to={'/distances/' + distance.id} >{distance.name}</Link></td>
+                    <td><Link to={'/distances/' + distance.id} >{effort === selectedEffort ? <b>{distance.name}</b> : distance.name}</Link></td>
                     <td>{secondsToString(time)}</td>
                     <td>{secondsToString(time * 1000 / distance.length)}</td>
                 </tr>
@@ -119,7 +138,7 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
                 </table>
             </Statistic>
 
-            {activity && <ActivityMap polyline={activity.polyline} />}
+            {activityStreams && <ActivityMap streams={activityStreams} effort={selectedEffort} />}
         </>
     );
 }

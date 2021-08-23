@@ -26,6 +26,9 @@ public class Effort {
     @ManyToOne
     private Activity activity;
 
+    private int ix0;
+    private int ix1;
+
     @JsonIgnoreProperties("bestEffort")
     @ManyToOne
     private Distance distance;
@@ -43,34 +46,39 @@ public class Effort {
         List<Integer> streamTime = activity.getStreamTime();
         List<Float> streamDistance = activity.getStreamDistance();
 
-        Iterator<Integer> tIt0 = streamTime.listIterator();
-        Iterator<Float> dIt0 = streamDistance.listIterator();
-        Iterator<Integer> tIt = streamTime.listIterator();
-        Iterator<Float> dIt = streamDistance.listIterator();
+        int ix0 = 0;
+        int ix1 = 0;
+        int size = streamTime.size();
 
-        float d0 = dIt0.next();
-        float d1 = dIt.next();
-        int t0 = tIt0.next();
-        int t1 = tIt.next();
+        float d0 = streamDistance.get(ix0);
+        float d1 = streamDistance.get(ix1);
+        int t0 = streamTime.get(ix0);
+        int t1 = streamTime.get(ix1);
 
         int time;
         int bestTime = Integer.MAX_VALUE;
+        int bestIx0 = 0, bestIx1 = 0;
 
-        while (dIt.hasNext()) {
-            while (dIt.hasNext() && d1 - d0 < distance.getLength()) {
-                d1 = dIt.next();
-                t1 = tIt.next();
+        while (ix1 < size - 1) {
+            while (ix1 < size - 1 && d1 - d0 < distance.getLength()) {
+                ix1++;
+                d1 = streamDistance.get(ix1);
+                t1 = streamTime.get(ix1);
             }
 
-            if (!dIt.hasNext())
+            if (d1 - d0 < distance.getLength())
                 break;
 
             time = t1 - t0;
-            if (time < bestTime)
+            if (time < bestTime) {
                 bestTime = time;
+                bestIx0 = ix0;
+                bestIx1 = ix1;
+            }
 
-            d0 = dIt0.next();
-            t0 = tIt0.next();
+            ix0++;
+            d0 = streamDistance.get(ix0);
+            t0 = streamTime.get(ix0);
         }
 
         if (bestTime == Integer.MAX_VALUE)
@@ -80,6 +88,9 @@ public class Effort {
         effort.setDistance(distance);
         effort.setActivity(activity);
         effort.setTime(bestTime);
+        effort.setIx0(bestIx0);
+        effort.setIx1(bestIx1);
+
         return effort;
     }
 }
