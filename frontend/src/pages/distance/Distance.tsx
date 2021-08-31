@@ -1,14 +1,14 @@
 import React, { FormEvent, useEffect, useState } from 'react';
-import { Button } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { PageTitle } from '../../components/shared/PageTitle';
 import { secondsToString } from '../../utils/secondsToString';
 import { Distance } from '../../types/distance';
 import { Statistic } from '../../components/shared/Statistic';
 import { Effort } from '../../types/effort';
-import EffortCanvas from '../../components/shared/EffortCanvas';
 import { BasicModal } from '../../components/shared/BasicModal';
 import { useAxios } from '../../hooks/useAxios';
+import DistanceEffortsChart from './DistanceEffortsChart';
 
 export const DistancePage: React.FC<RouteComponentProps> = props => {
     const [distance, setDistance] = useState<Distance>();
@@ -125,11 +125,11 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
                 handleSubmit={deleteDistance} />
 
             <Statistic name="Season's best efforts">
-                {seasonBest && <EffortCanvas data={seasonBest} by='month'></EffortCanvas>}
+                {seasonBest && <DistanceEffortsChart data={seasonBest} by='month'></DistanceEffortsChart>}
             </Statistic>
 
             <Statistic name="All time best efforts">
-                {allTimeBest && <EffortCanvas data={allTimeBest} by='year'></EffortCanvas>}
+                {allTimeBest && <DistanceEffortsChart data={allTimeBest} by='year'></DistanceEffortsChart>}
             </Statistic>
 
             <Statistic name="All efforts">

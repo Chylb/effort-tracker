@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Component, useEffect, useRef, useState } from 'react';
 import { FormEvent } from 'react';
-import { Button } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { BasicModal } from '../../components/shared/BasicModal';
 import { PageTitle } from '../../components/shared/PageTitle';
@@ -13,6 +13,8 @@ import { secondsToString } from '../../utils/secondsToString';
 
 import { ActivityMap } from '../../components/shared/ActivityMap';
 import { ActivityStreams } from '../../types/activityStreams';
+import { Area, AreaChart, CartesianGrid, Legend, Tooltip, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import { AltitudeChart } from './AltitudeChart.jsx';
 
 export const ActivityPage: React.FC<RouteComponentProps> = props => {
     const [activity, setActivity] = useState<Activity>();
@@ -138,7 +140,14 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
                 </table>
             </Statistic>
 
-            {activityStreams && <ActivityMap streams={activityStreams} effort={selectedEffort} />}
+            {activityStreams &&
+                <>
+                    <ActivityMap streams={activityStreams} effort={selectedEffort} />
+                    <Container>
+                        <AltitudeChart streams={activityStreams} effort={selectedEffort}></AltitudeChart>
+                    </Container>
+                </>
+            }
         </>
     );
 }
