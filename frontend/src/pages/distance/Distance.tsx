@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useState } from 'react';
-import { Button, Form } from "react-bootstrap";
+import { Button, Row, Col, Container, Form } from "react-bootstrap";
 import { Link, RouteComponentProps } from 'react-router-dom';
 import { PageTitle } from '../../components/shared/PageTitle';
 import { secondsToString } from '../../utils/secondsToString';
@@ -10,11 +10,22 @@ import { BasicModal } from '../../components/shared/BasicModal';
 import { useAxios } from '../../hooks/useAxios';
 import DistanceEffortsChart from './DistanceEffortsChart';
 
+const getEffortsYears = (efforts: Effort[]) => {
+    const years = new Set<number>();
+    for (const effort of efforts) {
+        const year = new Date(effort.activity.date).getFullYear();
+        years.add(year);
+    }
+
+    return [...years].sort().reverse().map((year) => {
+        return (<option>{year}</option>);
+    });
+}
+
 export const DistancePage: React.FC<RouteComponentProps> = props => {
     const [distance, setDistance] = useState<Distance>();
     const [efforts, setEfforts] = useState<Effort[]>([]);
-    const [seasonBest, setSeasonBest] = useState<Effort[]>();
-    const [allTimeBest, setAllTimeBest] = useState<Effort[]>();
+    const [selectedSeason, setSelectedSeason] = useState<Number>();
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
 
@@ -36,21 +47,11 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
         const fetchEfforts = async () => {
             const response = await axios.get(distanceUrl + '/efforts');
             setEfforts(response.data);
+
+            const effs: Effort[] = response.data;
+            setSelectedSeason(effs.map(x => new Date(x.activity.date).getFullYear()).sort().reverse()[0]);
         }
         fetchEfforts();
-
-        const fetchSeasonBest = async () => {
-            const response = await axios.get(distanceUrl + '/seasonBest?year=2020');
-            setSeasonBest(response.data);
-        }
-        fetchSeasonBest();
-
-        const fetchAllTimeBest = async () => {
-            const response = await axios.get(distanceUrl + '/allTimeBest');
-            setAllTimeBest(response.data);
-        }
-        fetchAllTimeBest();
-
     }, []);
 
     const deleteDistance = async (e: FormEvent) => {
@@ -125,11 +126,22 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
                 handleSubmit={deleteDistance} />
 
             <Statistic name="Season's best efforts">
-                {seasonBest && <DistanceEffortsChart data={seasonBest} by='month'></DistanceEffortsChart>}
+                {efforts && <DistanceEffortsChart efforts={efforts} type='season' selectedSeason={selectedSeason}></DistanceEffortsChart>}
+
+                <Col className="col-2 pl-4">
+                    <Form >
+                        <Form.Group>
+                            <Form.Label>Season:</Form.Label>
+                            <Form.Control as="select" onChange={e => setSelectedSeason(new Number(e.target.value))}>
+                                {getEffortsYears(efforts)}
+                            </Form.Control>
+                        </Form.Group>
+                    </Form>
+                </Col>
             </Statistic>
 
             <Statistic name="All time best efforts">
-                {allTimeBest && <DistanceEffortsChart data={allTimeBest} by='year'></DistanceEffortsChart>}
+                {efforts && <DistanceEffortsChart efforts={efforts} type='allTime'></DistanceEffortsChart>}
             </Statistic>
 
             <Statistic name="All efforts">

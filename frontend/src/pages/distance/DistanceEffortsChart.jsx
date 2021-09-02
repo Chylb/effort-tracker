@@ -1,20 +1,69 @@
-
 import { Scatter } from 'react-chartjs-2';
 import { secondsToString } from '../../utils/secondsToString';
 import { withRouter } from 'react-router-dom';
 
-const getXBy = (date, by) => {
-    if (by === 'year') {
+const getXBy = (date, type) => {
+    if (type === 'allTime') {
         return date.getFullYear();
     }
-    else if (by === 'month') {
+    else if (type === 'season') {
         return date.getMonth() + 1;
     }
 }
 
+const getData = (efforts, type, selectedSeason) => {
+    let data = [];
+    for (let effort of efforts) {
+        const date = new Date(effort.activity.date);
+
+        data.push({
+            x: getXBy(date, type),
+            y: effort.time,
+            id: effort.activity.id,
+            date: date.toISOString().split("T")[0],
+            dateObj: date,
+            name: effort.activity.name
+        });
+    }
+
+    function compare(d1, d2) {
+        if (d1.dateObj.getTime() < d2.dateObj.getTime())
+            return -1;
+        if (d1.dateObj.getTime() > d2.dateObj.getTime())
+            return 1;
+        return 0;
+    }
+
+    data.sort(compare);
+
+    if (type == 'season') {
+        data = data.filter(x => x.dateObj.getFullYear() == selectedSeason);
+    }
+
+    const bestData = [];
+    let bestPoint;
+    let currX;
+    for (let p of data) {
+        if (p.x != currX) {
+            bestData.push(bestPoint);
+            bestPoint = p;
+            currX = p.x;
+        }
+        else if (p.y < bestPoint.y) {
+            bestPoint = p;
+        }
+    }
+    if (bestPoint != undefined) {
+        bestData.push(bestPoint);
+    }
+
+    bestData.shift(1);
+    return bestData;
+}
+
 const DistanceEffortsChart = props => {
-    const generateOptions = (by) => {
-        return {
+    const generateOptions = (type) => {
+        const options = {
             animation: {
                 duration: 0
             },
@@ -47,7 +96,7 @@ const DistanceEffortsChart = props => {
                     type: 'linear',
                     title: {
                         display: true,
-                        text: by == 'month' ? 'Month' : 'Year'
+                        text: type == 'season' ? 'Month' : 'Year'
                     },
                     ticks: {
                         stepSize: 1
@@ -72,18 +121,16 @@ const DistanceEffortsChart = props => {
                 hoverRadius: 0
             }
         }
+
+        if (type == 'season') {
+            options.scales.x.min = 1;
+            options.scales.x.max = 12;
+        }
+        
+        return options;
     };
 
-    const data = [];
-    for (let d of props.data) {
-        data.push({
-            x: getXBy(new Date(d.activity.date), props.by),
-            y: d.time,
-            id: d.activity.id,
-            date: new Date(d.activity.date).toISOString().split("T")[0],
-            name: d.activity.name
-        });
-    }
+    const data = getData(props.efforts, props.type, props.selectedSeason);
 
     const chartData = {
         datasets: [{
@@ -101,7 +148,7 @@ const DistanceEffortsChart = props => {
 
     return (
         <>
-            <Scatter data={chartData} options={generateOptions(props.by)} height={60} />
+            <Scatter data={chartData} options={generateOptions(props.type)} height={60} />
         </>
     );
 }
