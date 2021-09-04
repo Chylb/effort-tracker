@@ -1,6 +1,7 @@
 package com.chylb.model.activity;
 
 import com.chylb.model.athlete.Athlete;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -31,6 +32,7 @@ public class Activity {
     private String type;
 
     @Lob
+    @JsonIgnore
     private String polyline;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -42,7 +44,7 @@ public class Activity {
     private boolean flagged;
 
     @Lob
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonIgnore
     private String activityStreamJson;
 
     @Transient

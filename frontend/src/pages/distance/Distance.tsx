@@ -72,7 +72,7 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
     }
 
     const renderTableData = () => {
-        return efforts.map((effort) => {
+        return efforts.filter(e => !e.flagged).map((effort) => {
             const { id, activity, distance, time } = effort;
             return (
                 <tr key={id}>
@@ -126,7 +126,7 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
                 handleSubmit={deleteDistance} />
 
             <Statistic name="Season's best efforts">
-                {efforts && <DistanceEffortsChart efforts={efforts} type='season' selectedSeason={selectedSeason}></DistanceEffortsChart>}
+                {efforts && <DistanceEffortsChart efforts={efforts.filter(e => !e.flagged)} type='season' selectedSeason={selectedSeason}></DistanceEffortsChart>}
 
                 <Col className="col-2 pl-4">
                     <Form >
@@ -141,7 +141,7 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
             </Statistic>
 
             <Statistic name="All time best efforts">
-                {efforts && <DistanceEffortsChart efforts={efforts} type='allTime'></DistanceEffortsChart>}
+                {efforts && <DistanceEffortsChart efforts={efforts.filter(e => !e.flagged)} type='allTime'></DistanceEffortsChart>}
             </Statistic>
 
             <Statistic name="All efforts">

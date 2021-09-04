@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EffortService {
@@ -24,8 +25,10 @@ public class EffortService {
         this.activityRepository = activityRepository;
     }
 
-    public List<Effort> getEfforts(Distance distance) {
-        return effortRepository.getEffortsByDistanceId(distance.getId());
+    public List<Effort> getUnflaggedEfforts(Distance distance) {
+        return effortRepository.getEffortsByDistanceId(distance.getId()).stream()
+                .filter(x -> !x.isFlagged())
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -37,13 +40,15 @@ public class EffortService {
             if (effort == null)
                 continue;
 
-            List<Effort> effortRanking = effortRepository.getEffortsByDistanceId(distance.getId());
+            List<Effort> effortRanking = getUnflaggedEfforts(distance);
             effortRanking.sort(Comparator.comparing(Effort::getTime));
             effortRanking.removeIf(e -> e.getActivity().getDate().after(activity.getDate()));
 
-            effort.setOrdinal(effortRanking.size());
-            int rank = addEffortToRanking(effortRanking, effort);
-            effort.setRank(rank);
+            if (!activity.isFlagged()) {
+                effort.setOrdinal(effortRanking.size());
+                int rank = addEffortToRanking(effortRanking, effort);
+                effort.setRank(rank);
+            }
 
             effortRepository.save(effort);
         }
@@ -63,14 +68,16 @@ public class EffortService {
             if (effort == null)
                 continue;
 
-            effort.setOrdinal(ordinal++);
-            int rank = addEffortToRanking(effortRanking, effort);
-            effort.setRank(rank);
+            if (!activity.isFlagged()) {
+                effort.setOrdinal(ordinal++);
+                int rank = addEffortToRanking(effortRanking, effort);
+                effort.setRank(rank);
+            }
 
             effortRepository.save(effort);
         }
 
-        if(effortRanking.size() > 0)
+        if (effortRanking.size() > 0)
             distance.setBestEffort(effortRanking.get(0));
         distance.setEffortCount(effortRanking.size());
     }
@@ -78,8 +85,6 @@ public class EffortService {
     @Transactional
     public void deleteEfforts(Activity activity) {
         for (Effort effort : effortRepository.getEffortsByActivityId(activity.getId())) {
-            if (effort.getDistance().getBestEffort() == effort)
-                effort.getDistance().setBestEffort(null);
             effortRepository.delete(effort);
         }
     }

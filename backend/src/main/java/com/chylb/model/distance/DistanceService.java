@@ -79,7 +79,7 @@ public class DistanceService {
         int bestTime = Integer.MAX_VALUE;
         Effort bestEffort = null;
 
-        for (Effort effort : effortService.getEfforts(distance)) {
+        for (Effort effort : effortService.getUnflaggedEfforts(distance)) {
             effortCount++;
             if (effort.getTime() < bestTime) {
                 bestTime = effort.getTime();

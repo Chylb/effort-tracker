@@ -75,13 +75,6 @@ public class ActivityService {
         activity.setFlagged(flag);
         activityRepository.save(activity);
 
-        if(!flag) {
-            activity.loadActivityStream();
-            effortService.generateEfforts(activity);
-        }
-        else
-            effortService.deleteEfforts(activity);
-
         distanceService.recalculateDistancesStatistics();
     }
 

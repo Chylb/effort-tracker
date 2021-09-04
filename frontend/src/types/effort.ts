@@ -10,4 +10,5 @@ export interface Effort {
     rank: number;
     ix0: number;
     ix1: number;
+    flagged: boolean;
 }

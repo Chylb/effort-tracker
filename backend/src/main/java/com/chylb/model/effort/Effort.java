@@ -39,6 +39,10 @@ public class Effort {
 
     private int rank;
 
+    public boolean isFlagged() {
+        return activity.isFlagged();
+    }
+
     public static Effort calculateEffort(Activity activity, Distance distance) {
         if (distance.getLength() > activity.getDistance())
             return null;

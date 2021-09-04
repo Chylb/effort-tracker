@@ -45,9 +45,11 @@ public class AthleteController {
     public ResponseEntity getAthleteSummary() throws JsonProcessingException {
         long id = athleteId();
         List<Distance> distances = distanceRepository.getDistancesByAthleteId(id);
-        List<Activity> activities = activityRepository.getActivitiesByAthleteId(id);
-        List<Effort> efforts = effortRepository.getEffortsByAthleteId(id);
-        efforts = efforts.stream().filter(e -> !e.getActivity().isFlagged()).collect(Collectors.toList());
+        List<Activity> activities = activityRepository.getActivitiesByAthleteId(id).stream()
+                .filter(a -> !a.isFlagged()).collect(Collectors.toList());
+
+        List<Effort> efforts = effortRepository.getEffortsByAthleteId(id).stream()
+                .filter(e -> !e.isFlagged()).collect(Collectors.toList());
 
         int bestPace = 0;
         if (distances.size() > 0)
