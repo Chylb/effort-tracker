@@ -74,20 +74,61 @@ public class ActivityController {
 
         float curveFactor = (float) (0.1f + Math.random() * 0.3f);
         for (int i = 0; i < time; i++) {
-            float pos = (float) ((1f + curveFactor * Math.cos(i / (float) time * Math.PI / 2f)) * i * speed);
+            float pos = (float) ((1f + curveFactor * -0.5 * Math.cos(i / (float) time * Math.PI * 3f)) * i * speed);
             streamDistance.add(pos);
         }
 
+        LinkedList<List<Float>> streamLatlng = new LinkedList<>();
+        double lat0 = 50.061693f + 0.2f * Math.random();
+        double lng0 = 19.937369f + 0.2f * Math.random();
+        float angle = (float) (Math.random() * 2 * Math.PI);
+        float mapDistance = (float) (1.5e-5 * length);
+        for (int i = 0; i < time; i++) {
+            double x = mapDistance * i / (float) time;
+            double y = mapDistance * 0.1f * Math.sin(i / (float) time * Math.PI * 2f);
+
+            double lat = lat0 + x * Math.cos(angle) - y * Math.sin(angle);
+            double lng = lng0 + x * Math.sin(angle) + y * Math.cos(angle);
+            List<Float> pos = new LinkedList();
+            pos.add((float) lat);
+            pos.add((float) lng);
+            streamLatlng.add(pos);
+        }
+
+        LinkedList<Float> streamAltitude = new LinkedList<>();
+        for (int i = 0; i < time; i++) {
+            double altitude = 200 + 20 * Math.sin(i / (float) time * Math.PI * 3f + Math.PI);
+            streamAltitude.add((float) altitude);
+        }
+
         ObjectMapper objectMapper = new ObjectMapper();
+
         ObjectNode timeData = objectMapper.createObjectNode();
         ArrayNode timeArray = objectMapper.valueToTree(streamTime);
         timeData.put("data", timeArray);
+        timeData.put("original_size", time);
+
         ObjectNode distanceData = objectMapper.createObjectNode();
         ArrayNode distanceArray = objectMapper.valueToTree(streamDistance);
         distanceData.put("data", distanceArray);
+        distanceData.put("original_size", time);
+
+        ObjectNode latlngData = objectMapper.createObjectNode();
+        ArrayNode latlngArray = objectMapper.valueToTree(streamLatlng);
+        latlngData.put("data", latlngArray);
+        latlngData.put("original_size", time);
+
+        ObjectNode altitudeData = objectMapper.createObjectNode();
+        ArrayNode altitudeArray = objectMapper.valueToTree(streamAltitude);
+        altitudeData.put("data", altitudeArray);
+        altitudeData.put("original_size", time);
+
         ObjectNode streamData = objectMapper.createObjectNode();
         streamData.put("time", timeData);
         streamData.put("distance", distanceData);
+        streamData.put("latlng", latlngData);
+        streamData.put("altitude", altitudeData);
+
         activity.setActivityStreamJson(streamData.toString());
 
         activity.setDistance(length);
