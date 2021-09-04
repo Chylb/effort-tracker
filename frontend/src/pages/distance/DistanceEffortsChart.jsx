@@ -106,6 +106,11 @@ const DistanceEffortsChart = props => {
                     title: {
                         display: true,
                         text: 'Time'
+                    },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            return secondsToString(value);
+                        }
                     }
                 }
             },
@@ -126,7 +131,7 @@ const DistanceEffortsChart = props => {
             options.scales.x.min = 1;
             options.scales.x.max = 12;
         }
-        
+
         return options;
     };
 
