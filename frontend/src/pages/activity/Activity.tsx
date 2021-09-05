@@ -8,7 +8,7 @@ import { Statistic } from '../../components/shared/Statistic';
 import { useAxios } from '../../hooks/useAxios';
 import { Activity } from '../../types/activity';
 import { Effort } from '../../types/effort';
-import { number2emoji } from '../../utils/emoji';
+import { prDescription, prMedal } from '../../utils/achievement';
 import { secondsToString } from '../../utils/secondsToString';
 
 import { ActivityMap } from '../../components/shared/ActivityMap';
@@ -81,25 +81,12 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
         }
     }
 
-    const rank2description = (rank: number) => {
-        switch (rank) {
-            case 1:
-                return "Personal record"
-            case 2:
-                return "2nd fastest time"
-            case 3:
-                return "3rd fastest time"
-            default:
-                return "";
-        }
-    }
-
     const renderTableData = () => {
         return efforts.map((effort) => {
             const { id, distance, time, rank, ordinal } = effort;
             return (
                 <tr key={id} onClick={() => setSelectedEffort(effort)}>
-                    <td>{ordinal > rank ? <div title={rank2description(rank + 1)}>{number2emoji(rank + 1)}</div> : ""}</td>
+                    <td>{ordinal > rank ? <div title={prDescription(rank)}>{prMedal(rank)}</div> : ""}</td>
                     <td><Link to={'/distances/' + distance.id} >{effort === selectedEffort ? <b>{distance.name}</b> : distance.name}</Link></td>
                     <td>{secondsToString(time)}</td>
                     <td>{secondsToString(time * 1000 / distance.length)}</td>
