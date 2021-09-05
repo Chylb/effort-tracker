@@ -15,48 +15,63 @@ const Map = ReactMapboxGl({
     scrollZoom: false
 });
 
-export const ActivityMap: React.FC<Props> = props => {
-    const reverseLatLong = (arr: Number[][]) => {
-        for (let i = 0; i < arr.length; i++) {
-            const tmp = arr[i][0];
-            arr[i][0] = arr[i][1];
-            arr[i][1] = tmp;
-        }
-    }
+const activityLinePaint = {
+    'line-color': '#FF0000',
+    'line-width': 3
+};
 
+const effortLinePaint = {
+    'line-color': '#105cb6',
+    'line-width': 3
+};
+
+const getGeoJsonData = (coordinates: any) => {
+    return {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'LineString',
+                    'coordinates': coordinates
+                }
+            }
+        ]
+    }
+}
+
+const reverseLatLong = (arr: Number[][]) => {
+    for (let i = 0; i < arr.length; i++) {
+        const tmp = arr[i][0];
+        arr[i][0] = arr[i][1];
+        arr[i][1] = tmp;
+    }
+}
+
+const getCenter = (coordinates: [number, number][]): [number, number] => {
+    let latMin = Number.POSITIVE_INFINITY;
+    let latMax = Number.NEGATIVE_INFINITY;
+    let lngMin = Number.POSITIVE_INFINITY;
+    let lngMax = Number.NEGATIVE_INFINITY;
+
+    for (const [lat, lng] of coordinates) {
+        latMin = Math.min(latMin, lat);
+        latMax = Math.max(latMax, lat);
+        lngMin = Math.min(lngMin, lng);
+        lngMax = Math.max(lngMax, lng);
+    }
+    return [(latMin + latMax) / 2, (lngMin + lngMax) / 2];
+}
+
+export const ActivityMap: React.FC<Props> = props => {
     const coordinates = JSON.parse(JSON.stringify(props.streams.latlng.data));
     reverseLatLong(coordinates);
-
-    const activityLinePaint = {
-        'line-color': '#FF0000',
-        'line-width': 3
-    };
-
-    const effortLinePaint = {
-        'line-color': '#105cb6',
-        'line-width': 3
-    };
-
-    const getGeoJsonData = (coordinates: any) => {
-        return {
-            'type': 'FeatureCollection',
-            'features': [
-                {
-                    'type': 'Feature',
-                    'geometry': {
-                        'type': 'LineString',
-                        'coordinates': coordinates
-                    }
-                }
-            ]
-        }
-    }
 
     return (
         <Container className="py-4">
             <Map
                 style="mapbox://styles/mapbox/outdoors-v11"
-                center={coordinates[0]}
+                center={getCenter(props.effort != undefined ? coordinates.slice(props.effort.ix0, props.effort.ix1) : coordinates)}
                 zoom={[13]}
                 containerStyle={{
                     height: '400px',
