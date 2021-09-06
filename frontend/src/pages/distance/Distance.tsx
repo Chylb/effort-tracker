@@ -9,6 +9,7 @@ import { Effort } from '../../types/effort';
 import { BasicModal } from '../../components/shared/BasicModal';
 import { useAxios } from '../../hooks/useAxios';
 import DistanceEffortsChart from './DistanceEffortsChart';
+import { useSortableData } from '../../hooks/useSortableData';
 
 const getEffortsYears = (efforts: Effort[]) => {
     const years = new Set<number>();
@@ -24,13 +25,15 @@ const getEffortsYears = (efforts: Effort[]) => {
 
 export const DistancePage: React.FC<RouteComponentProps> = props => {
     const [distance, setDistance] = useState<Distance>();
+
     const [efforts, setEfforts] = useState<Effort[]>([]);
+    const [flaggedEfforts, setFlaggedEfforts] = useState<Effort[]>([]);
+    const [sortedEfforts, requestSort, sortConfig] = useSortableData(efforts, { key: 'activity.date', direction: 'descending' });
+    const [sortedFlaggedEfforts, requestSortFlagged, sortConfigFlagged] = useSortableData(flaggedEfforts, { key: 'activity.date', direction: 'descending' });
+
     const [selectedSeason, setSelectedSeason] = useState<Number>();
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
-
-    const [sortKey, setSortKey] = useState<string>('');
-    const [sortReversed, setSortReversed] = useState<boolean>(false);
 
     const axios = useAxios();
 
@@ -46,10 +49,10 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
 
         const fetchEfforts = async () => {
             const response = await axios.get(distanceUrl + '/efforts');
-            setEfforts(response.data);
-
-            const effs: Effort[] = response.data;
-            setSelectedSeason(effs.map(x => new Date(x.activity.date).getFullYear()).sort().reverse()[0]);
+            const efforts: Effort[] = response.data;
+            setEfforts(efforts.filter(e => !e.flagged));
+            setFlaggedEfforts(efforts.filter(e => e.flagged));
+            setSelectedSeason(efforts.map(x => new Date(x.activity.date).getFullYear()).sort().reverse()[0]);
         }
         fetchEfforts();
     }, []);
@@ -71,45 +74,19 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
         }
     }
 
-    const renderTableData = () => {
-        return efforts.filter(e => !e.flagged).map((effort) => {
-            const { id, activity, distance, time } = effort;
+    const renderTableData = (efforts: Effort[]) => {
+        return efforts.map((effort) => {
+            const { id, activity, distance, time, flagged } = effort;
             return (
-                <tr key={id}>
+                <tr key={id} className={flagged ? "table-danger" : ""}>
                     <td><Link to={'/activities/' + activity.id} >{activity.name}</Link></td>
                     <td>{new Date(activity.date).toLocaleString('en-GB')}</td>
                     <td>{secondsToString(time)}</td>
                     <td>{secondsToString(time * 1000 / distance.length)}</td>
-                </tr>
+                </tr >
             )
         })
     }
-
-    const sortTable = (key: 'name' | 'date' | 'time') => {
-        let reversed = false;
-        if (key === sortKey)
-            reversed = !sortReversed;
-
-        let sorted: Effort[];
-
-        switch (key) {
-            case 'time':
-                sorted = [...efforts].sort((a, b) => a[key] - b[key]);
-                break;
-            case 'name':
-                sorted = [...efforts].sort((a, b) => a.activity[key].localeCompare(b.activity[key]));
-                break;
-            case 'date':
-                sorted = [...efforts].sort((a, b) => new Date(a.activity[key]).valueOf() - new Date(b.activity[key]).valueOf());
-                break;
-        }
-        if (reversed)
-            sorted.reverse();
-
-        setEfforts(sorted);
-        setSortKey(key);
-        setSortReversed(reversed);
-    };
 
     return (
         <>
@@ -148,14 +125,15 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col" onClick={() => { sortTable('name') }}>Activity</th>
-                            <th scope="col" onClick={() => { sortTable('date') }}>Date</th>
-                            <th scope="col" onClick={() => { sortTable('time') }}>Time</th>
-                            <th scope="col" onClick={() => { sortTable('time') }}>Pace</th>
+                            <th scope="col" onClick={() => { requestSort('activity.name'); requestSortFlagged('activity.name') }}>Activity</th>
+                            <th scope="col" onClick={() => { requestSort('activity.date'); requestSortFlagged('activity.date') }}>Date</th>
+                            <th scope="col" onClick={() => { requestSort('time'); requestSortFlagged('time') }}>Time</th>
+                            <th scope="col" onClick={() => { requestSort('time'); requestSortFlagged('time') }}>Pace</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {renderTableData()}
+                        {renderTableData(sortedEfforts)}
+                        {renderTableData(sortedFlaggedEfforts)}
                     </tbody>
                 </table>
             </Statistic>

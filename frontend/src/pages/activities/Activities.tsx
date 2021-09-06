@@ -3,26 +3,29 @@ import { Button, Container } from "react-bootstrap";
 import { Link } from 'react-router-dom';
 import { PageTitle } from '../../components/shared/PageTitle';
 import { useAxios } from '../../hooks/useAxios';
+import { useSortableData } from '../../hooks/useSortableData';
 import { Activity } from '../../types/activity';
 
 export const Activities: React.FC = () => {
     const [activities, setActivites] = useState<Activity[]>([]);
-
-    const [sortKey, setSortKey] = useState<string>('');
-    const [sortReversed, setSortReversed] = useState<boolean>(false);
+    const [flaggedActivities, setFlaggedActivities] = useState<Activity[]>([]);
+    const [sortedActivities, requestSort, sortConfig] = useSortableData(activities, { key: 'date', direction: 'descending' });
+    const [sortedFlaggedActivities, requestSortFlagged, sortConfigFlagged] = useSortableData(flaggedActivities, { key: 'date', direction: 'descending' });
 
     const axios = useAxios();
 
     useEffect(() => {
         const fetchData = async () => {
             const response = await axios.get('/activities');
-            setActivites(response.data);
+            const activities: Activity[] = response.data;
+            setActivites(activities.filter(a => !a.flagged));
+            setFlaggedActivities(activities.filter(a => a.flagged));
         };
 
         fetchData();
     }, [])
 
-    const renderTableData = () => {
+    const renderTableData = (activities: Activity[]) => {
         return activities.map((activity) => {
             const { id, name, distance, date, flagged } = activity;
             return (
@@ -35,32 +38,6 @@ export const Activities: React.FC = () => {
         })
     };
 
-    const sortTable = (key: 'distance' | 'name' | 'date') => {
-        let reversed = false;
-        if (key === sortKey)
-            reversed = !sortReversed;
-
-        let sorted: Activity[];
-
-        switch (key) {
-            case 'distance':
-                sorted = [...activities].sort((a, b) => a[key] - b[key]);
-                break;
-            case 'name':
-                sorted = [...activities].sort((a, b) => a[key].localeCompare(b[key]));
-                break;
-            case 'date':
-                sorted = [...activities].sort((a, b) => new Date(a[key]).valueOf() - new Date(b[key]).valueOf());
-                break;
-        }
-        if (reversed)
-            sorted.reverse();
-
-        setActivites(sorted);
-        setSortKey(key);
-        setSortReversed(reversed);
-    };
-
     return (
         <>
             <PageTitle title="My activities" />
@@ -69,13 +46,14 @@ export const Activities: React.FC = () => {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col" onClick={() => { sortTable('name') }}>Name</th>
-                            <th scope="col" onClick={() => { sortTable('distance') }}>Distance</th>
-                            <th scope="col" onClick={() => { sortTable('date') }}>Date</th>
+                            <th scope="col" onClick={() => { requestSort('name'); requestSortFlagged('name') }}>Name</th>
+                            <th scope="col" onClick={() => { requestSort('distance'); requestSortFlagged('distance') }}>Distance</th>
+                            <th scope="col" onClick={() => { requestSort('date'); requestSortFlagged('date') }}>Date</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {renderTableData()}
+                        {renderTableData(sortedActivities)}
+                        {renderTableData(sortedFlaggedActivities)}
                     </tbody>
                 </table>
                 <Button variant="outline-secondary" size="sm" className='float-right' onClick={() => axios.post('/activities')}>DEV generate activity</Button>

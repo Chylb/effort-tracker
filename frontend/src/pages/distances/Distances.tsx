@@ -6,9 +6,11 @@ import { secondsToString } from '../../utils/secondsToString';
 import { Distance } from '../../types/distance';
 import { AddDistanceModal } from './AddDistanceModal';
 import { useAxios } from '../../hooks/useAxios';
+import { useSortableData } from '../../hooks/useSortableData';
 
 export const DistancesPage: React.FC = () => {
     const [distances, setDistances] = useState<Distance[]>([]);
+    const [sortedDistances, requestSort, sortConfig] = useSortableData(distances, { key: 'length', direction: 'ascending' });
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
 

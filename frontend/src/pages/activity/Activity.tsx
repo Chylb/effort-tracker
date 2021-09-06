@@ -10,6 +10,7 @@ import { Activity } from '../../types/activity';
 import { Effort } from '../../types/effort';
 import { prDescription, prMedal } from '../../utils/achievement';
 import { secondsToString } from '../../utils/secondsToString';
+import { useSortableData } from '../../hooks/useSortableData';
 
 import { ActivityMap } from '../../components/shared/ActivityMap';
 import { ActivityStreams } from '../../types/activityStreams';
@@ -20,6 +21,7 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
     const [activity, setActivity] = useState<Activity>();
     const [activityStreams, setActivityStreams] = useState<ActivityStreams>();
     const [efforts, setEfforts] = useState<Effort[]>([]);
+    const [sortedEfforts, requestSort, sortConfig] = useSortableData(efforts, { key: 'time', direction: 'ascending' });
     const [selectedEffort, setSelectedEffort] = useState<Effort>();
 
     const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -82,7 +84,7 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
     }
 
     const renderTableData = () => {
-        return efforts.map((effort) => {
+        return sortedEfforts.map((effort) => {
             const { id, distance, time, rank, ordinal } = effort;
             return (
                 <tr key={id} onClick={() => setSelectedEffort(effort)}>
@@ -118,7 +120,7 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
                             <th scope="col"></th>
                             <th scope="col">Distance</th>
                             <th scope="col">Time</th>
-                            <th scope="col">Pace</th>
+                            <th scope="col">Pace </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -127,7 +129,8 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
                 </table>
             </Statistic>
 
-            {activityStreams &&
+            {
+                activityStreams &&
                 <>
                     <ActivityMap streams={activityStreams} effort={selectedEffort} />
                     <Container>
