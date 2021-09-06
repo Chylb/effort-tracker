@@ -5,6 +5,7 @@ import { PageTitle } from '../../components/shared/PageTitle';
 import { useAxios } from '../../hooks/useAxios';
 import { useSortableData } from '../../hooks/useSortableData';
 import { Activity } from '../../types/activity';
+import { icon } from '../../utils/icons';
 
 export const Activities: React.FC = () => {
     const [activities, setActivites] = useState<Activity[]>([]);
@@ -46,9 +47,9 @@ export const Activities: React.FC = () => {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col" onClick={() => { requestSort('name'); requestSortFlagged('name') }}>Name</th>
-                            <th scope="col" onClick={() => { requestSort('distance'); requestSortFlagged('distance') }}>Distance</th>
-                            <th scope="col" onClick={() => { requestSort('date'); requestSortFlagged('date') }}>Date</th>
+                            <th scope="col" onClick={() => { requestSort('name'); requestSortFlagged('name') }}>Name {sortConfig.key == 'name' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
+                            <th scope="col" onClick={() => { requestSort('distance'); requestSortFlagged('distance') }}>Distance {sortConfig.key == 'distance' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
+                            <th scope="col" onClick={() => { requestSort('date'); requestSortFlagged('date') }}>Date {sortConfig.key == 'date' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
                         </tr>
                     </thead>
                     <tbody>

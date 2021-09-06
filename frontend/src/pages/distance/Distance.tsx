@@ -10,6 +10,7 @@ import { BasicModal } from '../../components/shared/BasicModal';
 import { useAxios } from '../../hooks/useAxios';
 import DistanceEffortsChart from './DistanceEffortsChart';
 import { useSortableData } from '../../hooks/useSortableData';
+import { icon } from '../../utils/icons';
 
 const getEffortsYears = (efforts: Effort[]) => {
     const years = new Set<number>();
@@ -125,9 +126,9 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col" onClick={() => { requestSort('activity.name'); requestSortFlagged('activity.name') }}>Activity</th>
-                            <th scope="col" onClick={() => { requestSort('activity.date'); requestSortFlagged('activity.date') }}>Date</th>
-                            <th scope="col" onClick={() => { requestSort('time'); requestSortFlagged('time') }}>Time</th>
+                            <th scope="col" onClick={() => { requestSort('activity.name'); requestSortFlagged('activity.name') }}>Activity {sortConfig.key == 'activity.name' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
+                            <th scope="col" onClick={() => { requestSort('activity.date'); requestSortFlagged('activity.date') }}>Date {sortConfig.key == 'activity.date' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
+                            <th scope="col" onClick={() => { requestSort('time'); requestSortFlagged('time') }}>Time {sortConfig.key == 'time' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
                             <th scope="col" onClick={() => { requestSort('time'); requestSortFlagged('time') }}>Pace</th>
                         </tr>
                     </thead>
