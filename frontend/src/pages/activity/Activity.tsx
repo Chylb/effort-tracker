@@ -17,6 +17,23 @@ import { ActivityStreams } from '../../types/activityStreams';
 import { Area, AreaChart, CartesianGrid, Legend, Tooltip, Line, LineChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { AltitudeChart } from './AltitudeChart.jsx';
 
+const removeDuplicatePoints = (streams: ActivityStreams) => {
+    let i = 1;
+    const distanceStream = streams.distance.data;
+    const altitudeStream = streams.altitude.data;
+    while (i < distanceStream.length) {
+        const prev = distanceStream[i - 1];
+        const curr = distanceStream[i];
+        if (curr <= prev) {
+            distanceStream.splice(i, 1);
+            altitudeStream.splice(i, 1);
+        }
+        else {
+            i++;
+        }
+    }
+}
+
 export const ActivityPage: React.FC<RouteComponentProps> = props => {
     const [activity, setActivity] = useState<Activity>();
     const [activityStreams, setActivityStreams] = useState<ActivityStreams>();
@@ -59,6 +76,8 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
 
     const fetchStreams = async () => {
         const response = await axios.get(activityUrl + '/streams');
+        const streams: ActivityStreams = response.data;
+        removeDuplicatePoints(streams);
         setActivityStreams(response.data);
     }
 
