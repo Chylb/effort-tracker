@@ -4,6 +4,8 @@ import com.chylb.model.activity.Activity;
 import com.chylb.model.activity.ActivityRepository;
 import com.chylb.model.distance.Distance;
 import com.chylb.model.distance.DistanceRepository;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -23,6 +25,10 @@ public class EffortService {
         this.effortRepository = effortRepository;
         this.distanceRepository = distanceRepository;
         this.activityRepository = activityRepository;
+    }
+
+    public List<Effort> getEfforts() {
+        return effortRepository.getEffortsByAthleteId(athleteId());
     }
 
     public List<Effort> getUnflaggedEfforts(Distance distance) {
@@ -103,5 +109,10 @@ public class EffortService {
 
         ranking.add(ix, e);
         return ix;
+    }
+
+    private long athleteId() {
+        DefaultOAuth2User user = (DefaultOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return Long.parseLong(user.getName());
     }
 }

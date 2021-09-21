@@ -8,7 +8,7 @@ export const Header: React.FC = () => {
 	const { isAuthenticated, isLoading, athlete, logout } = useAuth();
 
 	return (
-		<> { isAuthenticated || isLoading ?
+		<> {isAuthenticated || isLoading ?
 			<Navbar bg="dark" variant="dark" expand="md" className="p-0 mb-3">
 				<Navbar.Brand as={Link} to="/home" className="p-0" > <img src={process.env.PUBLIC_URL + "/logo.png"} height="56" alt="logo" /> </Navbar.Brand>
 				<Navbar.Toggle aria-controls="responsive-navbar-nav" />
@@ -32,6 +32,7 @@ export const Header: React.FC = () => {
 									{athlete?.name}
 								</Dropdown.Toggle>
 								<Dropdown.Menu>
+									<Dropdown.Item as={Link} to="/settings">Settings</Dropdown.Item>
 									<Dropdown.Item onClick={logout}>Logout</Dropdown.Item>
 								</Dropdown.Menu>
 							</Dropdown>

@@ -66,7 +66,7 @@ public class Activity {
         a.setManual(node.get("manual").asBoolean());
         a.setFlagged(false);
 
-        TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(node.get("start_date_local").asText());
+        TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(node.get("start_date").asText());
         Instant i = Instant.from(ta);
         a.setDate(Date.from(i));
         return a;

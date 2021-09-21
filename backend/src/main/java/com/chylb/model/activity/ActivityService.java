@@ -133,6 +133,11 @@ public class ActivityService {
         System.out.println("Ended activity syncing");
     }
 
+    @Transactional
+    public void deleteActivity(Activity activity) {
+        activityRepository.delete(activity);
+    }
+
     private void addActivity(Activity activity) {
         activityRepository.save(activity);
         effortService.generateEfforts(activity);

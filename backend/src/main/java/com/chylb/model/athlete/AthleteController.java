@@ -2,19 +2,20 @@ package com.chylb.model.athlete;
 
 import com.chylb.model.activity.Activity;
 import com.chylb.model.activity.ActivityRepository;
+import com.chylb.model.activity.ActivityService;
 import com.chylb.model.distance.Distance;
 import com.chylb.model.distance.DistanceRepository;
+import com.chylb.model.distance.DistanceService;
 import com.chylb.model.effort.Effort;
 import com.chylb.model.effort.EffortRepository;
+import com.chylb.model.effort.EffortService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,33 +23,33 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping(path = "/api/athlete")
 public class AthleteController {
-    private final AthleteRepository athleteRepository;
-    private final ActivityRepository activityRepository;
-    private final DistanceRepository distanceRepository;
-    private final EffortRepository effortRepository;
+    private final DistanceService distanceService;
+    private final EffortService effortService;
+    private final AthleteService athleteService;
+    private final ActivityService activityService;
     private final ObjectMapper objectMapper;
 
-    AthleteController(AthleteRepository athleteRepository, ActivityRepository activityRepository, DistanceRepository distanceRepository, EffortRepository effortRepository, ObjectMapper objectMapper) {
-        this.athleteRepository = athleteRepository;
-        this.activityRepository = activityRepository;
-        this.distanceRepository = distanceRepository;
-        this.effortRepository = effortRepository;
+    AthleteController(DistanceService distanceService, EffortService effortService, AthleteService athleteService, ActivityService activityService, ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        this.distanceService = distanceService;
+        this.effortService = effortService;
+        this.athleteService = athleteService;
+        this.activityService = activityService;
     }
 
     @GetMapping()
     public Athlete getAthlete() {
-        return athleteRepository.getAthleteById(athleteId());
+        return athleteService.getAthlete();
     }
 
     @GetMapping("/summary")
     public ResponseEntity getAthleteSummary() throws JsonProcessingException {
-        long id = athleteId();
-        List<Distance> distances = distanceRepository.getDistancesByAthleteId(id);
-        List<Activity> activities = activityRepository.getActivitiesByAthleteId(id).stream()
-                .filter(a -> !a.isFlagged()).collect(Collectors.toList());
+        List<Distance> distances = distanceService.getDistances();
 
-        List<Effort> efforts = effortRepository.getEffortsByAthleteId(id).stream()
+        List<Activity> activities = activityService.getActivities().stream()
+                .filter(e -> !e.isFlagged()).collect(Collectors.toList());
+
+        List<Effort> efforts = effortService.getEfforts().stream()
                 .filter(e -> !e.isFlagged()).collect(Collectors.toList());
 
         int bestPace = 0;
@@ -65,9 +66,14 @@ public class AthleteController {
         return ResponseEntity.ok(objectMapper.writeValueAsString(summary));
     }
 
-    private long athleteId() {
-        DefaultOAuth2User user = (DefaultOAuth2User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return Long.parseLong(user.getName());
+    @PostMapping("/recalculateStatistics")
+    public void recalculateStatistics() {
+        athleteService.recalculateStatistics();
+    }
+
+    @DeleteMapping
+    public void deleteAccount() {
+        athleteService.deleteAthlete();
     }
 }
 

@@ -5,6 +5,7 @@ import { Activities } from './pages/activities/Activities';
 import { ActivityPage } from './pages/activity/Activity';
 import { DistancePage } from './pages/distance/Distance';
 import { DistancesPage } from './pages/distances/Distances';
+import { SettingsPage } from './pages/settings/Settings';
 import { Home } from './pages/home/Home';
 import { Login } from './pages/login/Login';
 import { Error } from './pages/error/Error';
@@ -31,6 +32,7 @@ const App: React.FC = () => {
           <ProtectedRoute exact path="/activities/:id" component={ActivityPage} />
           <ProtectedRoute exact path="/distances" component={DistancesPage} />
           <ProtectedRoute exact path="/distances/:id" component={DistancePage} />
+          <ProtectedRoute exact path="/settings" component={SettingsPage} />
           <ProtectedRoute path="/error" component={Error} />
           <Redirect from='*' to='/error' />
         </Switch>
