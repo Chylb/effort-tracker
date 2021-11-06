@@ -8,7 +8,7 @@ export const Header: React.FC = () => {
 	const { isAuthenticated, isLoading, athlete, logout } = useAuth();
 
 	return (
-		<> {isAuthenticated || isLoading ?
+		<> {isAuthenticated ?
 			<Navbar bg="dark" variant="dark" expand="md" className="p-0 mb-3">
 				<Navbar.Brand as={Link} to="/home" className="p-0" > <img src={process.env.PUBLIC_URL + "/logo.png"} height="56" alt="logo" /> </Navbar.Brand>
 				<Navbar.Toggle aria-controls="responsive-navbar-nav" />

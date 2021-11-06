@@ -69,7 +69,12 @@ public class DistanceService {
 
     @Transactional
     public void recalculateDistancesStatistics() {
-        for (Distance distance : distanceRepository.getDistancesByAthleteId(athleteId())) {
+        recalculateDistancesStatistics(athleteId());
+    }
+
+    @Transactional
+    public void recalculateDistancesStatistics(long athleteId) {
+        for (Distance distance : distanceRepository.getDistancesByAthleteId(athleteId)) {
             recalculateDistanceStatistics(distance);
         }
     }

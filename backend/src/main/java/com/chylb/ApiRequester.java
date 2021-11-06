@@ -1,9 +1,6 @@
 package com.chylb;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -59,6 +56,22 @@ public class ApiRequester {
             System.out.println(e.getMessage());
             return null;
         }
+    }
+
+    public ResponseEntity<String> sendPutRequest(
+            final OAuth2AuthorizedClient client,
+            final String url,
+            final String body) {
+
+        final RestTemplate restTemplate = new RestTemplate();
+
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(client.getAccessToken().getTokenValue());
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        final HttpEntity<String> entity = new HttpEntity<String>(body, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
+        return response;
     }
 }
 

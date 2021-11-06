@@ -20,7 +20,7 @@ export const Login: React.FC = () => {
     return (
         <>
             <Container style={{ width: "1009px" }} className="py-5">
-                <Carousel interval={5000}>
+                <Carousel interval={5000} fade={false}>
                     <Carousel.Item>
                         <img
                             src={process.env.PUBLIC_URL + '/features/activity.png'}

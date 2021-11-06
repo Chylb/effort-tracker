@@ -1,5 +1,8 @@
 server:
   port: ${PORT}
+  servlet:
+    session:
+      timeout: 3600m
 
 spring:
   application:
@@ -8,7 +11,7 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
 
-    url: jdbc:postgresql://172.16.121.10:5432/comchylb2?useSSL=true
+    url: jdbc:postgresql://192.168.137.130:5432/database_name4?useSSL=true
     username: postgres
     password: password
 
@@ -32,7 +35,7 @@ spring:
             client-authentication-method: POST
             authorization-grant-type: authorization_code
             redirect-uri: http://localhost:8080/login/oauth2/code/strava
-            scope: activity:read_all
+            scope: activity:read_all, activity:write
         provider:
           strava-provider:
             tokenUri: https://www.strava.com/oauth/token
