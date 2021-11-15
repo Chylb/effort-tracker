@@ -2,6 +2,31 @@
 import { Scatter } from 'react-chartjs-2';
 import { secondsToString } from '../../utils/secondsToString';
 
+const removeDuplicatePoints = (streams, effort) => {
+    let i = 1;
+    const distanceStream = streams.distance.data;
+    const altitudeStream = streams.altitude.data;
+    while (i < distanceStream.length) {
+        const prev = distanceStream[i - 1];
+        const curr = distanceStream[i];
+        if (curr <= prev) {
+            distanceStream.splice(i, 1);
+            altitudeStream.splice(i, 1);
+
+            if (effort !== undefined) {
+                if (i <= effort.ix0)
+                    effort.ix0--;
+
+                if (i <= effort.ix1)
+                    effort.ix1--;
+            }
+        }
+        else {
+            i++;
+        }
+    }
+}
+
 const generateOptions = (minmax) => {
     const options = {
         animation: {
@@ -92,11 +117,16 @@ const optimalChartMinmax = (altitude) => {
 
 export const AltitudeChart = props => {
     const data = [];
-    for (let i = 0; i < props.streams.altitude.original_size; i++) {
+    const streamsCopy = JSON.parse(JSON.stringify(props.streams));
+    const effortCopy = props.effort !== undefined ? JSON.parse(JSON.stringify(props.effort)) : undefined;
+
+    removeDuplicatePoints(streamsCopy, effortCopy);
+
+    for (let i = 0; i < streamsCopy.altitude.original_size; i++) {
         const row = {
-            x: props.streams.distance.data[i],
-            y: props.streams.altitude.data[i],
-            time: props.streams.time.data[i]
+            x: streamsCopy.distance.data[i],
+            y: streamsCopy.altitude.data[i],
+            time: streamsCopy.time.data[i]
         };
         data.push(row);
     }
@@ -105,13 +135,13 @@ export const AltitudeChart = props => {
         datasets: []
     }
     if (props.effort)
-        chartData.datasets.push(getDataset(data.slice(props.effort.ix0, props.effort.ix1), true))
+        chartData.datasets.push(getDataset(data.slice(effortCopy.ix0, effortCopy.ix1), true))
 
     chartData.datasets.push(getDataset(data));
 
     return (
         <>
-            <Scatter data={chartData} options={generateOptions(optimalChartMinmax(props.streams.altitude.data))} height={60} />
+            <Scatter data={chartData} options={generateOptions(optimalChartMinmax(streamsCopy.altitude.data))} height={60} />
         </>
     );
 }
