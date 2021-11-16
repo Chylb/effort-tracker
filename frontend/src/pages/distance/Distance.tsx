@@ -44,16 +44,20 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
     useEffect(() => {
         const fetchDistance = async () => {
             const response = await axios.get(distanceUrl);
-            setDistance(response.data);
+            if (response.data) {
+                setDistance(response.data);
+            }
         }
         fetchDistance();
 
         const fetchEfforts = async () => {
             const response = await axios.get(distanceUrl + '/efforts');
             const efforts: Effort[] = response.data;
-            setEfforts(efforts.filter(e => !e.flagged));
-            setFlaggedEfforts(efforts.filter(e => e.flagged));
-            setSelectedSeason(efforts.map(x => new Date(x.activity.date).getFullYear()).sort().reverse()[0]);
+            if (response.data) {
+                setEfforts(efforts.filter(e => !e.flagged));
+                setFlaggedEfforts(efforts.filter(e => e.flagged));
+                setSelectedSeason(efforts.map(x => new Date(x.activity.date).getFullYear()).sort().reverse()[0]);
+            }
         }
         fetchEfforts();
     }, []);

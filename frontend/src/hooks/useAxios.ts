@@ -1,24 +1,19 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
 import { useAuth } from "./useAuth";
+import {useHistory} from 'react-router-dom';
 
 export const useAxios = () => {
     const { logout } = useAuth();
-
-    const authenticationInterceptor = (response: AxiosResponse<any>) => {
-        if (response.status === 401 && response.data == '') {
-            logout();
-            return Promise.reject('unauthenticated');
-        }
-        return response;
-    }
+    const history = useHistory();
 
     const errorInterceptor = (error: AxiosError<any>) => {
-        if (error.response && error.response.data) {
-            return Promise.reject(error.response.data);
+        if (error.response!.status === 401 ) {
+            logout();
         }
-
-        logout();
-        return Promise.reject(error.message);
+        if(error.response!.status === 403 || error.response!.status === 404) {
+            history.push("/error");
+        }
+        return error;
     }
 
     const instance = axios.create({
@@ -29,7 +24,7 @@ export const useAxios = () => {
         }
     });
 
-    instance.interceptors.response.use(authenticationInterceptor, errorInterceptor);
+    instance.interceptors.response.use(res => res, errorInterceptor);
 
     return instance;
 }

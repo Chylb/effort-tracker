@@ -49,18 +49,23 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
 
     const fetchActivity = async () => {
         const response = await axios.get(activityUrl);
-        setActivity(response.data);
+        if (response.data) {
+            setActivity(response.data);
+        }
     }
 
     const fetchEfforts = async () => {
         const response = await axios.get(activityUrl + '/efforts');
-        setEfforts(response.data);
+        if (response.data) {
+            setEfforts(response.data);
+        }
     }
 
     const fetchStreams = async () => {
         const response = await axios.get(activityUrl + '/streams');
-        const streams: ActivityStreams = response.data;
-        setActivityStreams(streams);
+        if (response.data) {
+            setActivityStreams(response.data);
+        }
     }
 
     const flagActivity = async (e: FormEvent) => {
