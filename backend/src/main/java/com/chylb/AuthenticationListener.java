@@ -6,6 +6,7 @@ import com.chylb.model.athlete.AthleteRepository;
 import com.chylb.model.athlete.AthleteController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -19,10 +20,12 @@ import java.util.Optional;
 
 @Component
 public class AuthenticationListener implements ApplicationListener<InteractiveAuthenticationSuccessEvent> {
+    @Lazy
     @Autowired
     OAuth2AuthorizedClientService clientService;
     @Autowired
     AthleteRepository athleteRepository;
+    @Lazy
     @Autowired
     ActivityService activityService;
 
