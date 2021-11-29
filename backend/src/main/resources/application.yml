@@ -2,7 +2,7 @@ server:
   port: ${PORT}
   servlet:
     session:
-      timeout: 3600m
+      timeout: 36000m
 
 spring:
   application:

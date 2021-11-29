@@ -47,9 +47,10 @@ export const Activities: React.FC = () => {
                 <table className="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col" onClick={() => { requestSort('name'); requestSortFlagged('name') }}>Name {sortConfig.key == 'name' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
-                            <th scope="col" onClick={() => { requestSort('distance'); requestSortFlagged('distance') }}>Distance {sortConfig.key == 'distance' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
-                            <th scope="col" onClick={() => { requestSort('date'); requestSortFlagged('date') }}>Date {sortConfig.key == 'date' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
+                            <th scope="col"></th>
+                            <th scope="col" onClick={() => { requestSort('name'); requestSortFlagged('name') }}>Name {sortConfig.key == 'name' && (sortConfig.direction == 'ascending'?icon('chevron-down'): icon('chevron-up'))}</th>
+                            <th scope="col" onClick={() => { requestSort('distance'); requestSortFlagged('distance') }}>Distance {sortConfig.key == 'distance' && (sortConfig.direction == 'ascending'?icon('chevron-down'): icon('chevron-up'))}</th>
+                            <th scope="col" onClick={() => { requestSort('date'); requestSortFlagged('date') }}>Date {sortConfig.key == 'date' && (sortConfig.direction == 'ascending'?icon('chevron-down'): icon('chevron-up'))}</th>
                         </tr>
                     </thead>
                     <tbody>

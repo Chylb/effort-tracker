@@ -11,6 +11,7 @@ import { useAxios } from '../../hooks/useAxios';
 import DistanceEffortsChart from './DistanceEffortsChart';
 import { useSortableData } from '../../hooks/useSortableData';
 import { icon } from '../../utils/icons';
+import { prDescription, prMedal } from '../../utils/achievement';
 
 const getEffortsYears = (efforts: Effort[]) => {
     const years = new Set<number>();
@@ -81,9 +82,10 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
 
     const renderTableData = (efforts: Effort[]) => {
         return efforts.map((effort) => {
-            const { id, activity, distance, time, flagged } = effort;
+            const { id, activity, distance, time, flagged, ordinal, rank } = effort;
             return (
                 <tr key={id} className={flagged ? "table-danger" : ""}>
+                    <td>{ordinal > rank ? <div title={prDescription(rank)}>{prMedal(rank)}</div> : ""}</td>
                     <td><Link to={'/activities/' + activity.id} >{activity.name}</Link></td>
                     <td>{new Date(activity.date).toLocaleString('en-GB')}</td>
                     <td>{secondsToString(time)}</td>
@@ -130,6 +132,7 @@ export const DistancePage: React.FC<RouteComponentProps> = props => {
                 <table className="table table-striped">
                     <thead>
                         <tr>
+                            <th scope="col"> </th>
                             <th scope="col" onClick={() => { requestSort('activity.name'); requestSortFlagged('activity.name') }}>Activity {sortConfig.key == 'activity.name' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
                             <th scope="col" onClick={() => { requestSort('activity.date'); requestSortFlagged('activity.date') }}>Date {sortConfig.key == 'activity.date' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
                             <th scope="col" onClick={() => { requestSort('time'); requestSortFlagged('time') }}>Time {sortConfig.key == 'time' && (sortConfig.direction == 'ascending' ? icon('chevron-down') : icon('chevron-up'))}</th>
