@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -129,7 +130,7 @@ public class ActivityController {
         streamData.put("latlng", latlngData);
         streamData.put("altitude", altitudeData);
 
-        activity.setActivityStreamJson(streamData.toString());
+        activity.setActivityStreamJson(streamData.toString().getBytes());
 
         activity.setDistance(length);
         activity.setType("Run");

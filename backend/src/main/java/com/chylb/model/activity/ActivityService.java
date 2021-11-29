@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.transaction.Transactional;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,7 +71,7 @@ public class ActivityService {
         if (activity.getAthlete().getId() != athleteId())
             throw new ForbiddenException("Access denied");
 
-        return activity.getActivityStreamJson();
+        return new String(activity.getActivityStreamJson(), StandardCharsets.UTF_8);
     }
 
     @Transactional
@@ -125,7 +126,7 @@ public class ActivityService {
                     .toUriString();
 
             ResponseEntity<String> response = apiRequester.sendGetRequest(client, uri);
-            activity.setActivityStreamJson(response.getBody());
+            activity.setActivityStreamJson(response.getBody().getBytes());
 
             //Thread.sleep(9500);
             Thread.sleep(100);
@@ -220,7 +221,7 @@ public class ActivityService {
                 .toUriString();
 
         ResponseEntity<String> response = apiRequester.sendGetRequest(client, uri);
-        activity.setActivityStreamJson(response.getBody());
+        activity.setActivityStreamJson(response.getBody().getBytes());
     }
 
     private void setActivityDescription(OAuth2AuthorizedClient client, Activity activity, String description) {

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.*;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.io.IOException;
@@ -40,8 +41,9 @@ public class Activity {
     private boolean flagged;
 
     @Lob
+    @Type(type = "org.hibernate.type.ImageType")
     @JsonIgnore
-    private String activityStreamJson;
+    private byte[] activityStreamJson;
 
     @Transient
     private List<Integer> streamTime;

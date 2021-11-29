@@ -11,12 +11,12 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
 
-    url: jdbc:postgresql://192.168.137.130:5432/database_name4?useSSL=true
+    url: jdbc:postgresql://192.168.137.130:5432/database_name?useSSL=true
     username: postgres
     password: password
 
     hikari:
-      auto-commit: false
+      auto-commit: true
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
