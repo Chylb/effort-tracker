@@ -7,10 +7,10 @@ export const useAxios = () => {
     const history = useHistory();
 
     const errorInterceptor = (error: AxiosError<any>) => {
-        if (error.response!.status === 401 ) {
+        if (error.response === undefined || error.response!.status === 401 ) {
             logout();
         }
-        if(error.response!.status === 403 || error.response!.status === 404) {
+        else if(error.response!.status === 403 || error.response!.status === 404) {
             history.push("/error");
         }
         return error;
