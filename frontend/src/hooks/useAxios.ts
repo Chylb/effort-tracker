@@ -13,7 +13,7 @@ export const useAxios = () => {
         else if(error.response!.status === 403 || error.response!.status === 404) {
             history.push("/error");
         }
-        return error;
+        return error.response;
     }
 
     const instance = axios.create({

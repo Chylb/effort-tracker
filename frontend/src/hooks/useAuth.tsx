@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { Athlete } from "../types/athlete";
 import { deleteCookies } from "../utils/deleteCookies";
 import { useAxios } from "./useAxios";
@@ -22,11 +23,13 @@ const useProvideAuth = () => {
     const [isAuthenticated, setAuthenticated] = useState(false);
 
     const axios = useAxios();
+    const history = useHistory();
 
     const logout = () => {
         setAuthenticated(false);
         setAthlete(undefined);
         deleteCookies();
+        history.push("/login");
     }
 
     useEffect(() => {

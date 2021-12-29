@@ -49,11 +49,12 @@ export const DistancesPage: React.FC = () => {
                 fetchDistances();
             }
             else {
+                const nameAlreadyExists = response.data.message === "Name already occupied";
                 setAlert({
                     visible: true,
                     variant: "danger",
                     heading: "Error",
-                    message: "Something went wrong"
+                    message: nameAlreadyExists ? "Name already exists" : "Something went wrong"
                 })
             }
         }

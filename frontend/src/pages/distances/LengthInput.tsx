@@ -15,7 +15,7 @@ export const LengthInput: React.FC<Props> = props => {
     return (
         <>
             <legend>Distance in {props.unit}:</legend>
-            <input type="number" step="any" className="form-control" placeholder="Length" required={true}
+            <input type="number" step="any" min={0.001} className="form-control" placeholder="Length" required={true}
                 value={props.length}
                 onChange={handleChange} />
         </>
