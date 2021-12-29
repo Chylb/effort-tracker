@@ -28,6 +28,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,6 +65,10 @@ public class ActivityService {
             throw new ForbiddenException("Access denied");
 
         return activity;
+    }
+
+    public boolean activityExists(long id) {
+        return activityRepository.getActivityById(id) != null;
     }
 
     public String getActivityStreams(long id) {
@@ -119,6 +126,10 @@ public class ActivityService {
         }
         while (jsons.size() == 200);
 
+        newActivities = newActivities.stream().
+                filter(a -> !activityExists(a.getId()))
+                .collect(Collectors.toList());
+
         for (Activity activity : newActivities) {
             String uri = UriComponentsBuilder.newInstance().scheme("https").host("www.strava.com").path("/api/v3/activities/" + activity.getId() + "/streams")
                     .queryParam("keys", "time,distance,latlng,altitude")
@@ -133,7 +144,10 @@ public class ActivityService {
         }
 
         for (Activity activity : newActivities) {
-            addActivity(activity);
+            addActivityIfDoesntExist(activity.getId(), () -> {
+                addActivity(activity);
+                return null;
+            });
         }
         distanceService.recalculateDistancesStatistics(athleteId);
 
@@ -176,6 +190,13 @@ public class ActivityService {
     void addActivity(Activity activity) {
         activityRepository.save(activity);
         effortService.generateEfforts(activity);
+    }
+
+    @Transactional
+    public void addActivityIfDoesntExist(long activityId, Supplier<Void> addActivityFunction) {
+        if(!activityExists(activityId)) {
+            addActivityFunction.get();
+        }
     }
 
     @Transactional

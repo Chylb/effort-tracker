@@ -39,8 +39,11 @@ public class WebhookController {
                 subscriptionId.equals(envSubscriptionId)) {
             OAuth2AuthorizedClient client = clientService.loadAuthorizedClient("strava", ownerId);
 
-            ActivityService.CompleteActivity ca = activityService.fetchActivity(objectId, ownerId);
-            activityService.addActivityAndDescription(client, ca);
+            activityService.addActivityIfDoesntExist(Long.parseLong(objectId), () -> {
+                ActivityService.CompleteActivity ca = activityService.fetchActivity(objectId, ownerId);
+                activityService.addActivityAndDescription(client, ca);
+                return null;
+            });
         }
     }
 }
