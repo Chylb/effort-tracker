@@ -1,8 +1,17 @@
 import React, { useEffect } from 'react';
 import { Container, Carousel } from "react-bootstrap";
+import { useHistory } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 export const Login: React.FC = () => {
+    const { isAuthenticated } = useAuth();
+    const history = useHistory();
+    
     useEffect(() => {
+        if(isAuthenticated) {
+            history.replace("/home");
+        }
+        
         document.body.style.backgroundImage = 'url(' + process.env.PUBLIC_URL + '/background.jpg)';
         document.body.style.backgroundSize = 'cover';
 

@@ -9,6 +9,8 @@ export const useAxios = () => {
     const errorInterceptor = (error: AxiosError<any>) => {
         if (error.response === undefined || error.response!.status === 401 ) {
             logout();
+            history.replace("/login");
+            throw error;
         }
         else if(error.response!.status === 403 || error.response!.status === 404) {
             history.push("/error");
