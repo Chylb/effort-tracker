@@ -109,10 +109,9 @@ public class ActivityService {
                     .queryParam("per_page", 200)
                     .toUriString();
 
-            ResponseEntity<String> response = apiRequester.sendGetRequest(client, uri);
-            String body = response.getBody();
+            String response = apiRequester.sendGetRequest(client, uri);
 
-            jsons = objectMapper.readValue(body, new TypeReference<List<JsonNode>>() {
+            jsons = objectMapper.readValue(response, new TypeReference<List<JsonNode>>() {
             });
 
             for (JsonNode json : jsons) {
@@ -136,8 +135,8 @@ public class ActivityService {
                     .queryParam("key_by_type", true)
                     .toUriString();
 
-            ResponseEntity<String> response = apiRequester.sendGetRequest(client, uri);
-            activity.setActivityStreamJson(response.getBody().getBytes());
+            String response = apiRequester.sendGetRequest(client, uri);
+            activity.setActivityStreamJson(response.getBytes());
 
             //Thread.sleep(9500);
             Thread.sleep(100);
@@ -166,9 +165,9 @@ public class ActivityService {
         String uri = UriComponentsBuilder.newInstance().scheme("https").host("www.strava.com").path("/api/v3/activities/" + activityId)
                 .toUriString();
 
-        ResponseEntity<String> response = apiRequester.sendGetRequest(client, uri);
+        String response = apiRequester.sendGetRequest(client, uri);
         try {
-            JsonNode json = objectMapper.readValue(response.getBody(), JsonNode.class);
+            JsonNode json = objectMapper.readValue(response, JsonNode.class);
             Activity activity = Activity.fromJson(json);
             if (activity.getType().equals("Run") && !activity.isManual()) {
                 activity.setAthlete(athlete);
@@ -241,8 +240,8 @@ public class ActivityService {
                 .queryParam("key_by_type", true)
                 .toUriString();
 
-        ResponseEntity<String> response = apiRequester.sendGetRequest(client, uri);
-        activity.setActivityStreamJson(response.getBody().getBytes());
+        String response = apiRequester.sendGetRequest(client, uri);
+        activity.setActivityStreamJson(response.getBytes());
     }
 
     private void setActivityDescription(OAuth2AuthorizedClient client, Activity activity, String description) {
