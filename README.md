@@ -30,6 +30,14 @@ Effort tracker is a tool that keeps track of your running performance, based on 
     * CLIENT-SECRET= (Strava client secret)
     * WEBHOOK_SUBSCRIPTION_ID= (ID of Strava webhook subscription)
     
+## Screenshots
+![login](images/login.png)
+![home](images/home.png)
+![activities](images/activities.png)
+![activity](images/activity.png)
+![add_distance](images/add_distance.png)
+![distances](images/distances.png)
+![distance](images/distance.png)
 
  
  
