@@ -1,6 +1,7 @@
 package com.chylb.model.activity;
 
 import com.chylb.ApiRequester;
+import com.chylb.AuthenticationListener;
 import com.chylb.Utils;
 import com.chylb.exceptions.ForbiddenException;
 import com.chylb.exceptions.NotFoundException;
@@ -15,6 +16,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
@@ -35,6 +38,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class ActivityService {
+    private static final Logger logger = LoggerFactory.getLogger(ActivityService.class);
+
     private final OAuth2AuthorizedClientService clientService;
     private final DistanceService distanceService;
     private final ActivityRepository activityRepository;
@@ -175,7 +180,7 @@ public class ActivityService {
                 return new CompleteActivity(json, activity);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            logger.error("Exception during fetchActivity: {}", e.getMessage());
         }
         return null;
     }

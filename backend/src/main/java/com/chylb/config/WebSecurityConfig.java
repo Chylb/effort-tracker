@@ -1,6 +1,7 @@
 package com.chylb.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -19,6 +20,8 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+    @Value("${my.successUrl}")
+    private String SUCCESS_URL;
     @Lazy
     @Autowired
     private ClientRegistrationRepository clientRegistrationRepository;
@@ -38,7 +41,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .oauth2Login()
                 .authorizationEndpoint().authorizationRequestResolver(new CustomAuthorizationRequestResolver(this.clientRegistrationRepository))
                 .and()
-                .defaultSuccessUrl("http://localhost:3000/", true);
+                .defaultSuccessUrl(SUCCESS_URL, true);
     }
 
     private AuthenticationEntryPoint getRestAuthenticationEntryPoint() {

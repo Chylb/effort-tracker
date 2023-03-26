@@ -1,24 +1,33 @@
 package com.chylb.webhook;
 
-import com.chylb.ApiRequester;
 import com.chylb.model.activity.ActivityService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@AllArgsConstructor
 public class WebhookController {
+    private static final Logger logger = LoggerFactory.getLogger(WebhookController.class);
+
     private final OAuth2AuthorizedClientService clientService;
     private final ActivityService activityService;
     private final ObjectMapper objectMapper;
 
+    @Lazy
+    public WebhookController(OAuth2AuthorizedClientService clientService, ActivityService activityService, ObjectMapper objectMapper) {
+        this.clientService = clientService;
+        this.activityService = activityService;
+        this.objectMapper = objectMapper;
+    }
+
     @GetMapping(path = "/callback")
     ObjectNode validation(@RequestParam("hub.challenge") String challenge) {
-        System.out.println("Callback challenge");
+        logger.info("Callback challenge");
         ObjectNode object = objectMapper.createObjectNode();
         object.put("hub.challenge", challenge);
         return object;
@@ -26,7 +35,7 @@ public class WebhookController {
 
     @PostMapping(path = "/callback")
     void event(@RequestBody ObjectNode body) {
-        System.out.println("Callback event");
+        logger.info("Callback event");
 
         String aspectType = body.get("aspect_type").asText();
         String ownerId = body.get("owner_id").asText();

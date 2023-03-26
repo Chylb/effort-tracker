@@ -1,8 +1,11 @@
 server:
-  port: ${PORT}
+  port: 8080
   servlet:
     session:
       timeout: 36000m
+
+my:
+  successUrl: http://localhost:3000/
 
 spring:
   application:

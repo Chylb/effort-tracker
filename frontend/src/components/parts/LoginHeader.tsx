@@ -8,7 +8,7 @@ export const LoginHeader: React.FC = () => {
 				<Navbar.Brand href="/home" className="p-0" > <img src={process.env.PUBLIC_URL + "/logo.png"} height="56" alt="logo" /> </Navbar.Brand>
 
 				<Nav className="ml-auto">
-					<a href="http://localhost:8080/oauth2/authorization/strava"><img src={process.env.PUBLIC_URL + "/connect_with_strava.png"} alt="connect with strava" /></a>
+					<a href={process.env.REACT_APP_BACKEND_URL! + '/oauth2/authorization/strava'}><img src={process.env.PUBLIC_URL + "/connect_with_strava.png"} alt="connect with strava" /></a>
 				</Nav>
 
 			</Navbar>

@@ -19,7 +19,7 @@ export const useAxios = () => {
     }
 
     const instance = axios.create({
-        baseURL: 'http://localhost:8080/api',
+        baseURL: process.env.REACT_APP_BACKEND_URL! + '/api',
         withCredentials: true,
         headers: {
             'Accept': 'application/json',

@@ -14,22 +14,31 @@ Effort tracker is a tool that keeps track of your running performance, based on 
  - Node.js v14.16.1 >=
  - Npm 6.14.1 >= 
  - PostgreSQL 8.2 >=
- - JRE 15 >=
+ - JRE 17
 ## Setup
-
-### Frontend
- 1. create `.env` file and set `REACT_APP_MAPBOX_API_KEY` variable to your Mapbox API token
- 2. run `npm install`
+### Setup from source
+#### Frontend
+ 1. create `.env` file and set:
+    * `REACT_APP_MAPBOX_API_KEY`= Mapbox API token
+    * `REACT_APP_BACKEND_URL`=http://localhost:8080
+ 2. run `npm install --legacy-peer-deps`
  3. run `npm start`
 
-### Backend
+#### Backend
  1. configure database connection in `application.yml` file
  2. run Spring application with following enviroment variables:
-    * PORT=8080
-    * CLIENT-ID= (Strava client ID)
-    * CLIENT-SECRET= (Strava client secret)
-    * WEBHOOK_SUBSCRIPTION_ID= (ID of Strava webhook subscription)
+    * `CLIENT-ID`= Strava client ID
+    * `CLIENT-SECRET`= Strava client secret
+    * `WEBHOOK_SUBSCRIPTION_ID`= ID of Strava webhook subscription
     
+### Setup with Docker Compose
+1. create `.env` file and set:
+    * `MAPBOX_API_KEY`= Mapbox API token
+    * `STRAVA_CLIENT_ID=58561`= Strava client ID
+    * `STRAVA_CLIENT_SECRET`= ID of Strava webhook subscription
+2. run `docker compose build`
+3. run `docker compose up -d`
+
 ## Screenshots
 ![login](images/login.png)
 ![home](images/home.png)
