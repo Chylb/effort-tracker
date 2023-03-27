@@ -37,7 +37,7 @@ export const Header: React.FC = () => {
 								</Dropdown.Menu>
 							</Dropdown>
 
-							<a href="https://www.strava.com"><img src={process.env.PUBLIC_URL + "/powered_by_strava.svg"} height="56" alt="strava" /></a>
+							<a href="https://www.strava.com"><img src={process.env.PUBLIC_URL + "/powered_by_strava.svg"} height="56"/></a>
 						</Nav>
 					}
 				</Navbar.Collapse>
