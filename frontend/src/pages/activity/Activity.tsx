@@ -139,6 +139,7 @@ export const ActivityPage: React.FC<RouteComponentProps> = props => {
                 activityStreams &&
                 <>
                     <ActivityMap streams={activityStreams} effort={selectedEffort} />
+                    <br/>
                     <Container>
                         <AltitudeChart streams={activityStreams} effort={selectedEffort}></AltitudeChart>
                     </Container>

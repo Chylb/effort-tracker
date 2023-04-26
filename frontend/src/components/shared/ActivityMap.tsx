@@ -1,9 +1,13 @@
 import React from "react";
 import { Container } from "react-bootstrap";
 
-import ReactMapboxGl, { GeoJSONLayer, ZoomControl } from 'react-mapbox-gl';
+import ReactMapboxGl, { GeoJSONLayer, ZoomControl } from '@infamoustrey/react-mapbox-gl';
 import { ActivityStreams } from "../../types/activityStreams";
 import { Effort } from "../../types/effort";
+
+// @ts-ignore 
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import mapboxgl from '!mapbox-gl';
 
 interface Props {
     streams: ActivityStreams

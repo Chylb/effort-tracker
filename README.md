@@ -35,7 +35,7 @@ Effort tracker is a tool that keeps track of your running performance, based on 
 1. create `.env` file and set:
     * `MAPBOX_API_KEY`= Mapbox API token
     * `STRAVA_CLIENT_ID=58561`= Strava client ID
-    * `STRAVA_CLIENT_SECRET`= ID of Strava webhook subscription
+    * `STRAVA_CLIENT_SECRET`= Strava client secret
 2. run `docker compose build`
 3. run `docker compose up -d`
 

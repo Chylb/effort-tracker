@@ -111,7 +111,7 @@ public class ActivityService {
             String uri = UriComponentsBuilder.newInstance().scheme("https").host("www.strava.com").path("/api/v3/athlete/activities")
                     .queryParam("after", athlete.getLastActivitySync())
                     .queryParam("page", page)
-                    .queryParam("per_page", 200)
+                    .queryParam("per_page", 20)
                     .toUriString();
 
             String response = apiRequester.sendGetRequest(client, uri);
@@ -128,7 +128,7 @@ public class ActivityService {
             }
             page++;
         }
-        while (jsons.size() == 200);
+        while (jsons.size() == 20);
 
         newActivities = newActivities.stream().
                 filter(a -> !activityExists(a.getId()))
