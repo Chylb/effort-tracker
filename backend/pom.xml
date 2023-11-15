@@ -98,13 +98,13 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.5.4</version>
+            <version>1.6.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-security</artifactId>
-            <version>1.5.4</version>
+            <version>1.6.4</version>
         </dependency>
 
 <!--        <dependency>-->
